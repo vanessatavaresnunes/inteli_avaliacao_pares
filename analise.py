@@ -10,26 +10,42 @@ st.title("🔎 Análise das Avaliações de Pares")
 
 # Carregar todos os arquivos de avaliações
 
-# Listar arquivos do bucket Supabase
 
+# Listar arquivos do bucket Supabase
 arquivos = list_json_files_in_bucket(prefix="aval_")
-# st.info(f"Arquivos encontrados: {arquivos}")
 if not arquivos:
     st.warning("Nenhum dado de avaliação encontrado no Supabase.")
     st.stop()
 
+# Identificar turmas a partir dos nomes dos arquivos
+turmas = set()
+for arq in arquivos:
+    partes = arq.split('_')
+    if len(partes) > 2:
+        turmas.add(partes[1])
+turmas = sorted(list(turmas))
+if not turmas:
+    st.warning("Nenhuma turma encontrada nos arquivos de avaliação.")
+    st.stop()
+
+turma_selecionada = st.selectbox("Selecione a turma para análise:", turmas, key="analise_turma")
+
+# Filtrar arquivos da turma selecionada
+arquivos_turma = [arq for arq in arquivos if f"_{turma_selecionada}_" in arq]
+if not arquivos_turma:
+    st.warning(f"Nenhum dado de avaliação encontrado para a turma {turma_selecionada}.")
+    st.stop()
 
 # Carregar dados em DataFrame
 linhas = []
 import tempfile
-for arq in arquivos:
+for arq in arquivos_turma:
     if arq.startswith("avaliacoescompletas"):
         continue
     with tempfile.NamedTemporaryFile(delete=False, mode="w+b") as tmp:
         download_json_from_bucket(arq, tmp.name)
         tmp.seek(0)
         conteudo = tmp.read().decode("utf-8").strip()
-    # st.info(f"Arquivo: {arq} | Conteúdo inicial: {conteudo[:200]}")
         if conteudo:
             for linha in conteudo.splitlines():
                 linha = linha.strip()

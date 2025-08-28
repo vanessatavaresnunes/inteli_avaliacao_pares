@@ -1,3 +1,11 @@
+def file_exists_in_bucket(bucket_name: str, file_name: str) -> bool:
+    """Verifica se um arquivo existe no bucket do Supabase."""
+    supabase = get_supabase_client()
+    try:
+        files = supabase.storage.from_(bucket_name).list()
+        return any(f["name"] == file_name for f in files)
+    except Exception:
+        return False
 import os
 from dotenv import load_dotenv
 from supabase import create_client, Client
@@ -5,7 +13,7 @@ from supabase import create_client, Client
 load_dotenv()
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
-BUCKET_NAME = os.getenv("BUCKET_NAME", "avaliacaopares")
+BUCKET_NAME = os.getenv("BUCKET_NAME", "inteli_avaliacao_pares_sprint")
 
 def get_supabase_client():
     """Cria e retorna cliente Supabase"""

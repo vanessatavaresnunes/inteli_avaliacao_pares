@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Tuple
 import streamlit as st
 from src.models.avaliacao import AvaliacaoModel
 from src.models.usuario import UsuarioModel
+from src.utils.matricula_validator import MatriculaValidator
 
 
 class AvaliacaoController:
@@ -15,6 +16,7 @@ class AvaliacaoController:
     def __init__(self):
         self.avaliacao_model = AvaliacaoModel()
         self.usuario_model = UsuarioModel()
+        self.matricula_validator = MatriculaValidator()
     
     def inicializar_sessao(self):
         """Inicializa a sessão do Streamlit se necessário"""
@@ -33,7 +35,7 @@ class AvaliacaoController:
                 'conteudo_feedbacks': {'is_valid': True, 'messages': []}
             }
     
-    def fazer_login(self, time: str, aluno: str, senha: str) -> bool:
+    def fazer_login(self, time: str, aluno: str, senha: str, turma: str = None) -> bool:
         """
         Realiza o login do usuário
         
@@ -41,10 +43,12 @@ class AvaliacaoController:
             time: Nome do time
             aluno: Nome do aluno
             senha: Senha do aluno
+            turma: Turma selecionada
             
         Returns:
             True se login bem-sucedido, False caso contrário
         """
+        self.usuario_model.set_turma(turma)
         if self.usuario_model.validar_time(time) and \
            self.usuario_model.validar_aluno(time, aluno) and \
            self.usuario_model.validar_senha(time, aluno, senha):
@@ -52,6 +56,7 @@ class AvaliacaoController:
             st.session_state.aluno_atual = aluno
             st.session_state.aluno_id_atual = self.usuario_model.obter_id_aluno(aluno)
             st.session_state.time_atual = time
+            st.session_state.turma_atual = turma
             return True
         return False
     
@@ -88,12 +93,39 @@ class AvaliacaoController:
     def obter_alunos_para_avaliar(self) -> List[Dict[str, any]]:
         """
         Obtém lista de alunos que podem ser avaliados pelo usuário atual
-        
         Returns:
             Lista de alunos do mesmo time (excluindo o próprio)
         """
-        aluno_atual, time_atual = st.session_state.aluno_atual, st.session_state.time_atual
-        return self.usuario_model.obter_alunos_time_excluindo(time_atual, aluno_atual)
+        aluno_atual = st.session_state.aluno_atual
+        time_atual = st.session_state.time_atual
+        turma_atual = st.session_state.get('turma_atual', None)
+        
+        print(f"🔍 obter_alunos_para_avaliar:")
+        print(f"  aluno_atual: {aluno_atual}")
+        print(f"  time_atual: {time_atual}")
+        print(f"  turma_atual: {turma_atual}")
+        
+        # Usar MatriculaValidator para obter alunos do grupo
+        if turma_atual and time_atual:
+            try:
+                alunos_grupo = self.matricula_validator.obter_alunos_por_grupo(turma_atual, time_atual)
+                print(f"  MatriculaValidator retornou: {len(alunos_grupo)} alunos")
+                print(f"  Dados dos alunos: {alunos_grupo}")
+                
+                # Excluir o aluno atual da lista
+                alunos_para_avaliar = [aluno for aluno in alunos_grupo if aluno['nome'] != aluno_atual]
+                print(f"  Após exclusão: {len(alunos_para_avaliar)} alunos")
+                print(f"  Alunos para avaliar: {alunos_para_avaliar}")
+                
+                return alunos_para_avaliar
+            except Exception as e:
+                print(f"  ❌ Erro no MatriculaValidator: {e}")
+                # Fallback para o método antigo
+                return self.usuario_model.obter_alunos_time_excluindo(time_atual, aluno_atual, turma=turma_atual)
+        
+        # Fallback para o método antigo se necessário
+        print(f"  Usando fallback do modelo")
+        return self.usuario_model.obter_alunos_time_excluindo(time_atual, aluno_atual, turma=turma_atual)
     
     def inicializar_avaliacao_aluno(self, aluno: Dict[str, any]):
         """
@@ -282,10 +314,13 @@ class AvaliacaoController:
             sprint_atual = st.session_state.sprint_atual
             nomes_eixos = self.obter_nomes_eixos()
             nome_avaliador = self.usuario_model.obter_nome_aluno(aluno_id_atual)
+            turma_atual = st.session_state.get('turma_atual', None)
             arquivo = self.avaliacao_model.salvar_avaliacoes(
-                aluno_id_atual, time_atual, sprint_atual, st.session_state.avaliacoes_temp, nomes_eixos, nome_avaliador
+                aluno_id_atual, time_atual, sprint_atual, st.session_state.avaliacoes_temp, nomes_eixos, nome_avaliador, turma=turma_atual
             )
 
+            # Salvar uma cópia para a tela de sucesso
+            st.session_state['avaliacoes_temp_salvas'] = st.session_state.avaliacoes_temp.copy()
             # Limpar dados temporários
             del st.session_state.avaliacoes_temp
 
@@ -354,10 +389,65 @@ class AvaliacaoController:
         """Obtém as observações de um eixo específico"""
         return self.usuario_model.obter_observacoes_eixo(nome_eixo)
     
-    def obter_times(self) -> List[str]:
-        """Obtém lista de times disponíveis"""
-        return self.usuario_model.obter_times()
-    
-    def obter_alunos_por_time(self, time: str) -> List[str]:
-        """Obtém lista de alunos de um time"""
-        return self.usuario_model.obter_alunos_por_time(time)
+    def obter_turmas(self) -> List[str]:
+        """Obtém lista de turmas disponíveis"""
+        return self.usuario_model.obter_turmas()
+
+    def obter_times(self, turma: str = None) -> List[str]:
+        """Obtém lista de times disponíveis para a turma informada ou atual"""
+        return self.usuario_model.obter_times(turma)
+
+    def obter_alunos_por_time(self, time: str, turma: str = None) -> List[str]:
+        """Obtém lista de alunos de um time para a turma informada ou atual"""
+        return self.usuario_model.obter_alunos_por_time(time, turma)
+
+    def configurar_turma_grupo(self, turma: str, grupo: str):
+        """
+        Configura a turma e grupo para o usuário atual
+        
+        Args:
+            turma: Nome da turma (ex: T13)
+            grupo: Nome do grupo (ex: Grupo 1)
+        """
+        # Configurar turma no modelo de usuário
+        self.usuario_model.set_turma(turma)
+        
+        # Configurar sessão com turma e grupo
+        st.session_state.turma_atual = turma
+        st.session_state.time_atual = grupo
+        
+        # Se já temos o nome do usuário logado, usar ele
+        if hasattr(st.session_state, 'user_name') and st.session_state.user_name:
+            st.session_state.aluno_atual = st.session_state.user_name
+            # Buscar o ID do usuário usando MatriculaValidator
+            dados_usuario = self.matricula_validator.buscar_aluno_por_email(st.session_state.get('user_email', ''))
+            if dados_usuario:
+                st.session_state.aluno_id_atual = dados_usuario['id']
+            else:
+                # Fallback para o método antigo
+                st.session_state.aluno_id_atual = self.usuario_model.obter_id_aluno(st.session_state.user_name)
+            st.session_state.logado = True
+        else:
+            # Buscar informações do usuário no grupo (fallback)
+            try:
+                # Obter alunos do grupo para configurar o usuário atual usando MatriculaValidator
+                alunos_grupo = self.matricula_validator.obter_alunos_por_grupo(turma, grupo)
+                
+                if alunos_grupo:
+                    # Configurar o primeiro aluno como usuário atual
+                    primeiro_aluno = alunos_grupo[0]
+                    st.session_state.aluno_atual = primeiro_aluno.get('nome', '')
+                    st.session_state.aluno_id_atual = primeiro_aluno.get('id', 0)
+                    st.session_state.logado = True
+                    
+            except Exception as e:
+                st.error(f"Erro ao configurar turma/grupo: {str(e)}")
+                st.session_state.logado = False
+        
+        # Inicializar avaliações temporárias
+        if 'avaliacoes_temp' not in st.session_state:
+            st.session_state.avaliacoes_temp = {}
+        
+        # Configurar sprint padrão
+        if 'sprint_atual' not in st.session_state:
+            st.session_state.sprint_atual = "Sprint 1"

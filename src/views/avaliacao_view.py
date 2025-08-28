@@ -21,20 +21,34 @@ class AvaliacaoView:
 
 
         st.title("📊 Avaliação de Pares")
-        aluno_atual, time_atual = st.session_state.aluno_atual, st.session_state.time_atual
-        st.markdown(f"**Aluno:** {aluno_atual}")
-        st.markdown(f"**Time:** {time_atual}")
-        if st.button("Logout", type="secondary"):
-            self.controller.fazer_logout()
-            st.rerun()
-
+        
+        # Informações do usuário em linha horizontal compacta
+        col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
+        
+        with col1:
+            st.markdown(f"**👤 Nome:** {st.session_state.aluno_atual}")
+        
+        with col2:
+            st.markdown(f"**🏫 Turma:** {st.session_state.get('turma_atual', 'N/A')}")
+        
+        with col3:
+            st.markdown(f"**👥 Grupo:** {st.session_state.time_atual}")
+        
+        with col4:
+            if st.button("🚪 Logout", type="secondary", use_container_width=True):
+                self.controller.fazer_logout()
+                st.rerun()
+        
+        st.markdown("---")
+        
+        # Seleção de sprint
         st.selectbox("Selecione a Sprint", [f"Sprint {i}" for i in range(1, 6)], key="sprint_atual")
 
         # Obter dados do usuário atual
         alunos_time = self.controller.obter_alunos_para_avaliar()
-
+        
         # Instruções
-        st.markdown(f"### Avalie seus colegas do time {st.session_state.time_atual}")
+        st.markdown(f"### Avalie seus colegas do grupo {st.session_state.time_atual}")
         st.markdown(f"**Instruções:** Para cada eixo, distribua um total de {len(alunos_time) + 1} pontos entre seus colegas.")
 
         # Matriz de avaliação
@@ -141,7 +155,6 @@ class AvaliacaoView:
 
         # Display messages from session_state
         st.markdown("**Soma das Notas por Eixo:**")
-        #st.write("DEBUG soma_notas details:", st.session_state.validation_messages['soma_notas']['details'])
         for eixo, details in st.session_state.validation_messages['soma_notas']['details'].items():
             soma_atual = details.get('soma_atual', 0)
             soma_esperada = details.get('soma_esperada', 0)
@@ -227,37 +240,124 @@ class AvaliacaoView:
     def _renderizar_tela_sucesso(self):
         """Renderiza a tela de sucesso após salvar avaliações."""
         st.title("✅ Avaliações salvas com sucesso!")
+        
+        # Obter dados do usuário com validações
         id_avaliador = st.session_state.get('aluno_id_atual')
-        nome_avaliador = self.controller.usuario_model.obter_nome_aluno(id_avaliador) if id_avaliador else ""
+        turma_atual = st.session_state.get('turma_atual')
+        user_name = st.session_state.get('user_name')
+        aluno_atual = st.session_state.get('aluno_atual')
+        
+        # Fallback para nome do avaliador - priorizar dados da sessão
+        if user_name:
+            nome_avaliador = user_name
+        elif aluno_atual:
+            nome_avaliador = aluno_atual
+        elif id_avaliador and turma_atual:
+            nome_avaliador = self.controller.usuario_model.obter_nome_aluno(id_avaliador, turma=turma_atual)
+        else:
+            nome_avaliador = "Usuário"
+        
+        # Garantir que temos um nome válido
+        if not nome_avaliador or nome_avaliador == "None":
+            nome_avaliador = "Usuário"
+        
         st.markdown(f"**{nome_avaliador}**, suas avaliações foram registradas. Veja abaixo o resumo das avaliações realizadas:")
-        avaliacoes_ultima = st.session_state.get('avaliacoes_ultima', [])
-        if not avaliacoes_ultima:
+        
+        # Obter avaliações temporárias salvas
+        avaliacoes_temp = st.session_state.get('avaliacoes_temp_salvas', st.session_state.get('avaliacoes_temp', {}))
+        nomes_eixos = self.controller.obter_nomes_eixos()
+        
+        if not avaliacoes_temp:
             st.info("Nenhuma avaliação encontrada para exibir.")
             return
-        # Filtrar apenas as avaliações feitas pelo usuário atual
-        avaliacoes_usuario = [a for a in avaliacoes_ultima if a.get('id_avaliador') == id_avaliador]
-        if not avaliacoes_usuario:
-            st.info("Nenhuma avaliação encontrada para exibir.")
-            return
-        # Agrupar por avaliado
-        from collections import defaultdict
-        avaliacoes_por_aluno = defaultdict(list)
-        for av in avaliacoes_usuario:
-            avaliacoes_por_aluno[av['id_avaliado']].append(av)
-        for id_avaliado, avals in avaliacoes_por_aluno.items():
-            # Buscar nome do avaliado, se não estiver no JSON, buscar pelo controller
-            nome_avaliado = avals[0].get('nome_avaliado')
-            if not nome_avaliado:
+        
+        # Obter lista de alunos do grupo para mapear IDs para nomes
+        alunos_grupo = self.controller.obter_alunos_para_avaliar()
+        
+        # Verificar se os dados estão sendo carregados corretamente
+        if not alunos_grupo:
+            st.error("❌ Erro: Nenhum aluno encontrado no grupo!")
+            st.info("Tentando carregar dados diretamente do modelo...")
+            
+            # Tentar carregar dados diretamente do modelo
+            if turma_atual and st.session_state.get('time_atual'):
                 try:
-                    nome_avaliado = self.controller.usuario_model.obter_nome_aluno(id_avaliado)
-                except Exception:
-                    nome_avaliado = "(Nome não encontrado)"
+                    alunos_grupo = self.controller.usuario_model.obter_alunos_por_time(
+                        st.session_state.get('time_atual'), 
+                        turma_atual
+                    )
+                    st.success(f"✅ Carregados {len(alunos_grupo)} alunos do modelo")
+                except Exception as e:
+                    st.error(f"❌ Erro ao carregar do modelo: {e}")
+                    alunos_grupo = []
+        
+        # Se ainda não temos alunos, tentar obter todos os alunos da turma
+        if not alunos_grupo and turma_atual:
+            try:
+                # Obter todos os alunos da turma (incluindo todos os grupos)
+                todos_alunos_turma = self.controller.usuario_model._carregar_alunos(turma_atual)
+                alunos_grupo = []
+                for grupo, alunos_grupo_lista in todos_alunos_turma.items():
+                    alunos_grupo.extend(alunos_grupo_lista)
+                st.info(f"✅ Carregados {len(alunos_grupo)} alunos de todos os grupos da turma {turma_atual}")
+            except Exception as e:
+                st.error(f"❌ Erro ao carregar todos os alunos da turma: {e}")
+                alunos_grupo = []
+        
+        # Criar mapeamento ID -> Nome
+        mapeamento_id_nome = {}
+        for aluno in alunos_grupo:
+            if 'id' in aluno and 'nome' in aluno:
+                mapeamento_id_nome[aluno['id']] = aluno['nome']
+        
+        # Se ainda não temos mapeamento, tentar usar o MatriculaValidator diretamente
+        if not mapeamento_id_nome and turma_atual and st.session_state.get('time_atual'):
+            try:
+                from src.utils.matricula_validator import MatriculaValidator
+                validator = MatriculaValidator()
+                todos_alunos_grupo = validator.obter_alunos_por_grupo(turma_atual, st.session_state.get('time_atual'))
+                
+                for aluno in todos_alunos_grupo:
+                    if 'id' in aluno and 'nome' in aluno:
+                        mapeamento_id_nome[aluno['id']] = aluno['nome']
+                
+                st.info(f"✅ Mapeamento criado via MatriculaValidator: {len(mapeamento_id_nome)} alunos")
+            except Exception as e:
+                st.error(f"❌ Erro no MatriculaValidator: {e}")
+        
+        # Debug: mostrar mapeamento criado
+        '''
+        st.sidebar.markdown("### 🔍 Debug - Mapeamento ID-Nome")
+        st.sidebar.markdown(f"**Total de alunos:** {len(alunos_grupo)}")
+        st.sidebar.markdown(f"**Mapeamento criado:** {len(mapeamento_id_nome)}")
+        st.sidebar.markdown(f"**IDs das avaliações:** {list(avaliacoes_temp.keys())}")
+        st.sidebar.markdown(f"**Exemplo mapeamento:** {dict(list(mapeamento_id_nome.items())[:3])}")
+        '''
+        # Renderizar cada avaliação
+        for id_avaliado, notas_feedbacks in avaliacoes_temp.items():
+            # Obter nome do aluno avaliado usando o mapeamento local
+            nome_avaliado = mapeamento_id_nome.get(id_avaliado)
+            
+            # Se não encontrou no mapeamento local, tentar pelo modelo
+            if not nome_avaliado:
+                if turma_atual:
+                    nome_avaliado = self.controller.usuario_model.obter_nome_aluno(id_avaliado, turma=turma_atual)
+                
+                # Fallback final
+                if not nome_avaliado or nome_avaliado == "None":
+                    nome_avaliado = f"Aluno ID {id_avaliado}"
+            
             st.markdown(f"#### 👤 {nome_avaliado}")
-            for av in avals:
-                eixo = av['eixo']
-                nota = av['nota']
-                feedback = av['feedback']
-                st.markdown(f"- **{eixo}**: Nota **{nota}** | Feedback: _{feedback}_")
+            
+            # Renderizar notas e feedbacks
+            for i, nome_eixo in enumerate(nomes_eixos):
+                if i < len(notas_feedbacks['notas']) and i < len(notas_feedbacks['feedbacks']):
+                    nota = notas_feedbacks['notas'][i]
+                    feedback = notas_feedbacks['feedbacks'][i]
+                    st.markdown(f"- **{nome_eixo}**: Nota **{nota}** | Feedback: _{feedback}_")
+                else:
+                    st.warning(f"⚠️ Dados incompletos para o eixo: {nome_eixo}")
+            
             st.markdown("---")
     
     def mostrar_mensagem_erro(self, mensagem: str):

@@ -30,19 +30,54 @@ class UsuarioModel:
             diretorio_config: Diretório onde estão os arquivos de configuração
         """
         self.diretorio_config = diretorio_config
-        self.alunos = self._carregar_alunos()
+        self.turma_atual = None
+        self.alunos = {}
         self.eixos = self._carregar_eixos()
         self.config = self._carregar_configuracao()
-    
-    def _carregar_alunos(self) -> Dict[str, List[Dict[str, str]]]:
-        """Carrega dados dos alunos do arquivo JSON"""
+        
+        # Carregar dados iniciais de alunos (sem turma específica)
+        try:
+            self.alunos = self._carregar_alunos()
+        except Exception as e:
+            print(f"Erro ao carregar dados iniciais de alunos: {e}")
+            self.alunos = {}
+
+    def obter_turmas(self) -> list:
+        """Retorna as turmas disponíveis baseadas no arquivo alunos.json principal."""
+        try:
+            # Carregar o arquivo alunos.json principal
+            caminho_arquivo = Path(self.diretorio_config) / "alunos.json"
+            if caminho_arquivo.exists():
+                with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
+                    dados = json.load(arquivo)
+                    return list(dados.keys())  # Retorna as turmas (T09, T13, T14, etc.)
+            return []
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Erro ao carregar turmas do arquivo alunos.json: {e}")
+            return []
+
+    def _carregar_alunos(self, turma: str = None) -> Dict[str, List[Dict[str, str]]]:
+        """Carrega dados dos alunos do arquivo alunos.json principal."""
         try:
             caminho_arquivo = Path(self.diretorio_config) / "alunos.json"
             with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
-                return json.load(arquivo)
+                dados = json.load(arquivo)
+                
+                # Se uma turma específica foi solicitada, retorna apenas ela
+                if turma and turma in dados:
+                    return {turma: dados[turma]}
+                
+                # Se não foi especificada turma, retorna todas
+                return dados
+                
         except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"Erro ao carregar alunos.json: {e}")
+            print(f"Erro ao carregar alunos do arquivo alunos.json: {e}")
             return {}
+
+    def set_turma(self, turma: str):
+        """Define a turma atual e carrega os alunos dessa turma."""
+        self.turma_atual = turma
+        self.alunos = self._carregar_alunos(turma)
 
     def validar_senha(self, time: str, aluno: str, senha: str) -> bool:
         """
@@ -88,34 +123,33 @@ class UsuarioModel:
             print(f"Erro ao carregar config.json: {e}")
             return {"nota_minima": 0, "nota_maxima": 3}
     
-    def obter_times(self) -> List[str]:
-        """Retorna lista de times disponíveis"""
+    def obter_times(self, turma: str = None) -> List[str]:
+        """Retorna lista de times disponíveis para a turma informada ou atual."""
+        if turma:
+            alunos = self._carregar_alunos(turma)
+            return list(alunos.keys())
         return list(self.alunos.keys())
-    
-    def obter_alunos_por_time(self, time: str) -> List[Dict[str, any]]:
+
+    def obter_alunos_por_time(self, time: str, turma: str = None) -> List[Dict[str, any]]:
         """
-        Retorna lista de alunos de um time específico
-        
-        Args:
-            time: Nome do time
-            
-        Returns:
-            Lista de dicionários de alunos do time
+        Retorna lista de alunos de um time específico para a turma informada ou atual.
         """
+        if turma:
+            alunos = self._carregar_alunos(turma)
+            return alunos.get(time, [])
         return self.alunos.get(time, [])
     
-    def obter_alunos_time_excluindo(self, time: str, aluno_excluir: str) -> List[Dict[str, any]]:
+    def obter_alunos_time_excluindo(self, time: str, aluno_excluir: str, turma: str = None) -> List[Dict[str, any]]:
         """
         Retorna lista de alunos de um time excluindo um aluno específico
-        
         Args:
             time: Nome do time
             aluno_excluir: Nome do aluno a ser excluído
-            
+            turma: Turma a ser considerada
         Returns:
             Lista de alunos do time sem o aluno excluído
         """
-        alunos_time = self.obter_alunos_por_time(time)
+        alunos_time = self.obter_alunos_por_time(time, turma)
         return [aluno for aluno in alunos_time if aluno['nome'] != aluno_excluir]
     
     def obter_aluno_por_nome(self, nome_aluno: str) -> Optional[Dict[str, any]]:
@@ -163,18 +197,48 @@ class UsuarioModel:
         aluno = self.obter_aluno_por_nome(nome_aluno)
         return aluno['id'] if aluno else None
 
-    def obter_nome_aluno(self, id_aluno: int) -> Optional[str]:
+    def obter_nome_aluno(self, id_aluno: int, turma: str = None) -> Optional[str]:
         """
-        Retorna o nome de um aluno pelo ID.
-
+        Retorna o nome de um aluno pelo ID, considerando a turma se informada.
         Args:
             id_aluno: ID do aluno.
-
+            turma: Turma a ser considerada (opcional)
         Returns:
             Nome do aluno ou None se não encontrado.
         """
-        aluno = self.obter_aluno_por_id(id_aluno)
-        return aluno['nome'] if aluno else None
+        try:
+            print(f"🔍 Buscando aluno ID {id_aluno} na turma {turma}")
+            
+            # Carregar dados de usuários
+            caminho_usuarios = Path(self.diretorio_config) / "usuarios" / "usuarios.json"
+            if not caminho_usuarios.exists():
+                print(f"❌ Arquivo usuarios.json não encontrado em {caminho_usuarios}")
+                return None
+            
+            with open(caminho_usuarios, 'r', encoding='utf-8') as arquivo:
+                usuarios = json.load(arquivo)
+            
+            # Buscar aluno pelo ID
+            for email, dados in usuarios.items():
+                if dados.get('id') == id_aluno:
+                    nome_aluno = dados.get('name')
+                    turma_aluno = dados.get('turma')
+                    
+                    print(f"✅ Aluno encontrado: ID {id_aluno} -> Nome: '{nome_aluno}', Turma: {turma_aluno}")
+                    
+                    # Se uma turma específica foi solicitada, verificar se corresponde
+                    if turma and turma_aluno != turma:
+                        print(f"⚠️ Aluno ID {id_aluno} pertence à turma {turma_aluno}, mas foi solicitada a turma {turma}")
+                        continue
+                    
+                    return nome_aluno
+            
+            print(f"❌ Aluno ID {id_aluno} não encontrado no arquivo usuarios.json")
+            return None
+            
+        except Exception as e:
+            print(f"❌ Erro ao buscar aluno ID {id_aluno} na turma {turma}: {e}")
+            return None
 
     def obter_eixos(self) -> List[Dict[str, any]]:
         """Retorna lista de eixos de avaliação com nome, descrição e observações"""

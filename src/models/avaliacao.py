@@ -39,33 +39,40 @@ class AvaliacaoModel:
         Path(self.diretorio_dados).mkdir(parents=True, exist_ok=True)
     
     def salvar_avaliacoes(self, id_avaliador: int, time: str, sprint: str, 
-                         avaliacoes: Dict, nomes_eixos: List[str], nome_avaliador: str) -> str:
+                         avaliacoes: Dict, nomes_eixos: List[str], nome_avaliador: str, turma: str = None) -> str:
         """
         Salva as avaliações em arquivo json
-        
         Args:
             id_avaliador: ID do aluno que fez a avaliação
             time: Time do avaliador
             sprint: Sprint que está sendo avaliada
             avaliacoes: Dicionário com as avaliações
             nomes_eixos: Lista com os nomes dos eixos
-            
         Returns:
             Caminho do arquivo salvo
         """
-        import time as time_mod
-        from datetime import timezone
-        now = datetime.now(timezone.utc)
+        import pytz
+        tz = pytz.timezone('America/Sao_Paulo')
+        now = datetime.now(tz)
         data = now.strftime("%Y%m%d")
         horaminuto = now.strftime("%H%M")
         grupo = str(time)
         spt = str(sprint)
-        nome_arquivo = f"aval_G{grupo}_S{spt}_{id_avaliador}_{data}_{horaminuto}.json"
+        turma_str = turma if turma else "unica"
+        nome_arquivo = f"aval_{turma_str}_{grupo}_{spt}_{id_avaliador}_{data}_{horaminuto}.json"
         # Preparar dados para salvar
         dados_para_salvar = []
         timestamp = int(now.timestamp())
+        # Buscar nome do avaliador usando o modelo de usuário
+        nome_avaliador = self.usuario_model.obter_nome_aluno(id_avaliador, turma)
+        print(f"🔍 Nome do avaliador obtido: '{nome_avaliador}' para ID {id_avaliador}")
+        
+        # Buscar nomes dos alunos avaliados
         for id_avaliado, notas in avaliacoes.items():
-            nome_avaliado = self.usuario_model.obter_nome_aluno(id_avaliado)
+            print(f"🔍 Buscando nome para aluno ID: {id_avaliado}")
+            nome_avaliado = self.usuario_model.obter_nome_aluno(id_avaliado, turma)
+            print(f"✅ Nome obtido para ID {id_avaliado}: '{nome_avaliado}'")
+            
             for i, nome_eixo in enumerate(nomes_eixos):
                 feedback_normalizado = unicodedata.normalize('NFC', notas['feedbacks'][i])
                 dados_para_salvar.append({
@@ -74,18 +81,22 @@ class AvaliacaoModel:
                     'id_avaliador': id_avaliador,
                     'nome_avaliador': nome_avaliador,
                     'time': time,
+                    'turma': turma,  # Adicionando campo turma
                     'id_avaliado': id_avaliado,
                     'nome_avaliado': nome_avaliado,
                     'eixo': nome_eixo,
                     'nota': notas['notas'][i],
                     'feedback': feedback_normalizado
                 })
+        
+        print(f"📊 Total de registros para salvar: {len(dados_para_salvar)}")
+        print(f"📋 Primeiro registro: {dados_para_salvar[0] if dados_para_salvar else 'Nenhum'}")
+        print(f"📋 Último registro: {dados_para_salvar[-1] if dados_para_salvar else 'Nenhum'}")
         df = pd.DataFrame(dados_para_salvar)
         # Criar arquivo temporário
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as tmp_file:
             df.to_json(tmp_file.name, orient='records', lines=True, force_ascii=False)
             arquivo_temp = tmp_file.name
-        
         try:
             # Upload para Supabase
             upload_json_to_bucket(arquivo_temp, nome_arquivo)
@@ -94,7 +105,6 @@ class AvaliacaoModel:
         finally:
             # Limpar arquivo temporário
             os.unlink(arquivo_temp)
-        
         return nome_arquivo
     
     def _salvar_arquivo_consolidado(self, df_novo: pd.DataFrame):
