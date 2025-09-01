@@ -6,6 +6,47 @@ import json
 def cadastro_view():
     """Tela de cadastro de novos usuários com validação de matrícula"""
     
+    # Verificar se há sucesso de cadastro para mostrar
+    if st.session_state.get("cadastro_sucesso"):
+        dados_sucesso = st.session_state["cadastro_sucesso"]
+        
+        # Debug: verificar se os dados estão corretos
+        # st.write("Debug - Dados de sucesso:", dados_sucesso)
+        
+        # Container principal para posicionar a tela
+        success_container = st.container()
+        
+        with success_container:
+            st.title("🎉 Cadastro Realizado com Sucesso!")
+            st.markdown("---")
+            
+            # Mostrar mensagem de sucesso
+            st.success("🎉 **Cadastro realizado com sucesso!**")
+            st.balloons()
+            
+            # Container com informações detalhadas
+            with st.container(border=True):
+                st.markdown("### ✅ Conta Criada com Sucesso!")
+                st.markdown(f"**👤 Nome:** {dados_sucesso['nome']}")
+                st.markdown(f"**📧 Email:** {dados_sucesso['email']}")
+                st.markdown(f"**🏫 Turma:** {dados_sucesso['turma']}")
+                st.markdown(f"**👥 Grupo:** {dados_sucesso['grupo']}")
+                st.markdown("**🔐 Status:** Conta ativa e pronta para uso")
+            
+            # Botão para ir ao login
+            st.markdown("---")
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                if st.button("🔐 Ir para o Login", type="primary", use_container_width=True):
+                    # Limpar dados de sucesso e voltar ao login
+                    del st.session_state["cadastro_sucesso"]
+                    st.session_state["show_cadastro"] = False
+                    st.rerun()
+        
+        # Mensagem de sucesso exibida com sucesso
+        
+        return True
+    
     # Inicializar storage de usuários e validador
     user_storage = UserStorage()
     matricula_validator = MatriculaValidator()
@@ -189,22 +230,18 @@ def cadastro_view():
                 success, message = user_storage.create_user(email, nome_final, password, turma, grupo)
             
             if success:
-                st.success("🎉 **Cadastro realizado com sucesso!**")
-                st.info(f"**Bem-vindo(a), {nome_final}!** Sua conta foi criada e está pronta para uso.")
-                st.balloons()
-                
-                # Limpar formulário
-                st.session_state["show_cadastro"] = False
-                
+                # Armazenar dados do sucesso na sessão para mostrar fora do formulário
+                st.session_state["cadastro_sucesso"] = {
+                    "nome": nome_final,
+                    "email": email,
+                    "turma": turma,
+                    "grupo": grupo
+                }
+                # NÃO definir show_cadastro = False aqui, para manter na tela de cadastro
+                st.rerun()
                 return True
             else:
                 st.error(f"❌ {message}")
                 return False
-    
-    # Após o formulário, mostrar botão para ir ao login se o cadastro foi bem-sucedido
-    if st.session_state.get("show_cadastro") == False:
-        st.success("✅ Cadastro concluído! Redirecionando...")
-        if st.button("🔐 Ir para o Login", type="primary", use_container_width=True):
-            st.rerun()
     
     return False

@@ -4,6 +4,44 @@ from src.utils.user_storage import UserStorage
 def password_reset_view():
     """Tela para redefinir senha"""
     
+    # Verificar se há sucesso de alteração de senha para mostrar
+    if st.session_state.get("senha_alterada_sucesso"):
+        dados_sucesso = st.session_state["senha_alterada_sucesso"]
+        
+        # Container principal para a mensagem de sucesso
+        success_container = st.container()
+        
+        with success_container:
+            st.title("✅ Senha Alterada com Sucesso!")
+            st.markdown("---")
+            
+            # Mostrar mensagem de sucesso
+            st.success("🔑 **Senha alterada com sucesso!**")
+            st.balloons()
+            
+            # Container com informações detalhadas
+            with st.container(border=True):
+                st.markdown("### ✅ Alteração Realizada!")
+                st.markdown(f"**📧 Email:** {dados_sucesso['email']}")
+                st.markdown(f"**👤 Nome:** {dados_sucesso['nome']}")
+                st.markdown(f"**🏫 Turma:** {dados_sucesso['turma']}")
+                st.markdown("**🔐 Status:** Senha atualizada com sucesso")
+                st.markdown("**⏰ Data/Hora:** " + dados_sucesso['timestamp'])
+            
+            # Botão para ir ao login
+            st.markdown("---")
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                if st.button("🔐 Ir para o Login", type="primary", use_container_width=True):
+                    # Limpar dados de sucesso e voltar ao login
+                    del st.session_state["senha_alterada_sucesso"]
+                    st.session_state["show_password_reset"] = False
+                    st.rerun()
+        
+        # Mensagem de sucesso exibida com sucesso
+        
+        return True
+    
     # Inicializar storage de usuários
     user_storage = UserStorage()
     
@@ -76,12 +114,24 @@ def password_reset_view():
             success, message = user_storage.update_password(email, new_password)
             
             if success:
-                st.success(f"✅ {message}")
-                st.balloons()
+                # Buscar informações do usuário para mostrar na mensagem de sucesso
+                user_info = user_storage.get_user_info(email)
+                nome_usuario = user_info.get('name', 'Usuário') if user_info else 'Usuário'
+                turma_usuario = user_info.get('turma', 'N/A') if user_info else 'N/A'
                 
-                # Limpar formulário
-                st.session_state["show_password_reset"] = False
+                # Armazenar dados do sucesso na sessão para mostrar fora do formulário
+                from datetime import datetime
+                timestamp_atual = datetime.now().strftime("%d/%m/%Y às %H:%M")
                 
+                st.session_state["senha_alterada_sucesso"] = {
+                    "email": email,
+                    "nome": nome_usuario,
+                    "turma": turma_usuario,
+                    "timestamp": timestamp_atual
+                }
+                
+                # NÃO definir show_password_reset = False aqui, para manter na tela de alteração
+                st.rerun()
                 return True
             else:
                 st.error(f"❌ {message}")

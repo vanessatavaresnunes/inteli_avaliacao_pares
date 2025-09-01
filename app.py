@@ -32,9 +32,9 @@ def main():
     # Verificar se usuário está autenticado
     if not st.session_state.get("user_authenticated", False):
         # Mostrar tela de login
-        if st.session_state.get("show_cadastro", False):
+        if st.session_state.get("show_cadastro", False) or st.session_state.get("cadastro_sucesso"):
             cadastro_view()
-        elif st.session_state.get("show_password_reset", False):
+        elif st.session_state.get("show_password_reset", False) or st.session_state.get("senha_alterada_sucesso"):
             password_reset_view()
         else:
             login_view()

@@ -400,5 +400,29 @@
     "passwd": "",
     "turma": "T09",
     "id": 67
+  },
+  "vanessa.nunes@prof.inteli.edu.br": {
+    "name": "Vanessa Tavares Nunes",
+    "passwd": "",
+    "turma": "Teste",
+    "id": 68
+  },
+  "hermano.peixoto@prof.inteli.edu.br": {
+    "name": "Hermano Peixoto de Oliveira Junior",
+    "passwd": "",
+    "turma": "Teste",
+    "id": 69
+  },
+  "afonso.brandao@prof.inteli.edu.br": {
+    "name": "Afonso Brandão",
+    "passwd": "$2b$12$jyIJyj33jZ1WCN2iaMZf7eYSISKEcTds9NPC1jyw0il55xtpXJ/4u",
+    "turma": "Teste",
+    "id": 70
+  },
+  "jose.romualdo@prof.inteli.edu.br": {
+    "name": "José Romualdo",
+    "passwd": "",
+    "turma": "Teste",
+    "id": 71
   }
 }

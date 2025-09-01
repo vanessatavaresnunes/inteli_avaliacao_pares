@@ -78,7 +78,7 @@ def login_view():
             col_btn1, col_btn2 = st.columns(2)
             
             with col_btn1:
-                if st.button("📝 Novo Cadastro", use_container_width=True, type="secondary"):
+                if st.button("📝 Criar Nova Conta", use_container_width=True, type="secondary"):
                     st.session_state["show_cadastro"] = True
                     st.rerun()
             

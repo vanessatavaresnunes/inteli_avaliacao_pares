@@ -617,6 +617,6 @@ class AvaliacaoController:
         if 'avaliacoes_temp' not in st.session_state:
             st.session_state.avaliacoes_temp = {}
         
-        # Configurar sprint padrão
+        # Configurar sprint padrão (Sprint 1 desabilitada - já acabou)
         if 'sprint_atual' not in st.session_state:
-            st.session_state.sprint_atual = "Sprint 1"
+            st.session_state.sprint_atual = "Sprint 2"

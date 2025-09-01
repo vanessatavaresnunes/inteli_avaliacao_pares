@@ -62,7 +62,7 @@ O aplicativo será aberto automaticamente em: `http://localhost:8501`
 - Interface personalizada por usuário
 
 ### ✅ Sistema de Avaliação
-- Seleção de sprint (1-5)
+- Seleção de sprint (2-5) - Sprint 1 desabilitada (já acabou)
 - Avaliação por eixos
 - Validação de notas e feedbacks
 - Salvamento seguro das avaliações

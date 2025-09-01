@@ -384,5 +384,104 @@
     "email": "vanessa.nunes@prof.inteli.edu.br",
     "ip_address": "N/A",
     "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:38:49.276604",
+    "acao": "CADASTRO",
+    "email": "ana.silva@sou.inteli.edu.br",
+    "username": "Ana Carolina de Jesus Pacheco da Silva",
+    "turma": "T13",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:39:04.278905",
+    "acao": "LOGIN",
+    "email": "ana.silva@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:45:53.943748",
+    "acao": "CADASTRO",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "username": "Afonso Brandão",
+    "turma": "Teste",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:48:09.644180",
+    "acao": "CADASTRO",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "username": "Afonso Brandão",
+    "turma": "Teste",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:49:32.222622",
+    "acao": "CADASTRO",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "username": "Afonso Brandão",
+    "turma": "Teste",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:51:00.725582",
+    "acao": "CADASTRO",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "username": "Afonso Brandão",
+    "turma": "Teste",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:51:11.115414",
+    "acao": "LOGIN",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:56:48.038117",
+    "acao": "LOGIN",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:56:48.559370",
+    "acao": "ALTERACAO_SENHA",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:58:33.503037",
+    "acao": "LOGIN",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:58:33.896071",
+    "acao": "ALTERACAO_SENHA",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:59:50.655451",
+    "acao": "LOGIN",
+    "email": "afonso.brandao@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
   }
 ]

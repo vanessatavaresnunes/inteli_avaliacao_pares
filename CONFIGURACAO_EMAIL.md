@@ -57,7 +57,7 @@ print(f"Teste: {message}")
 ```python
 # Dados de teste
 avaliacoes_teste = {
-    'sprint': 'Sprint 1',
+    'sprint': 'Sprint 2',
     'grupo': 'Grupo 1',
     'avaliacoes': [
         {

@@ -40,8 +40,8 @@ class AvaliacaoView:
         
         st.markdown("---")
         
-        # Seleção de sprint
-        st.selectbox("Selecione a Sprint", [f"Sprint {i}" for i in range(1, 6)], key="sprint_atual")
+        # Seleção de sprint (Sprint 1 desabilitada - já acabou)
+        st.selectbox("Selecione a Sprint", [f"Sprint {i}" for i in range(2, 6)], key="sprint_atual")
 
         # Obter dados do usuário atual
         alunos_time = self.controller.obter_alunos_para_avaliar()
