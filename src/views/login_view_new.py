@@ -18,7 +18,8 @@ def login_view():
         
         with col2:
             st.markdown("### Acesso ao Sistema")
-            st.info("Use seu email institucional @sou.inteli.edu.br")
+            from src.utils.email_validator import get_allowed_domains_text
+            st.info(f"Use seu email institucional {get_allowed_domains_text()}")
             
             # Formulário de login
             with st.form("login_form"):
@@ -42,8 +43,9 @@ def login_view():
                         st.error("❌ Preencha todos os campos!")
                         return False
                     
-                    if not email.endswith("@sou.inteli.edu.br"):
-                        st.error("❌ Use apenas email institucional @sou.inteli.edu.br!")
+                    from src.utils.email_validator import is_valid_inteli_email, get_allowed_domains_text
+                    if not is_valid_inteli_email(email):
+                        st.error(f"❌ Use apenas email institucional {get_allowed_domains_text()}!")
                         return False
                     
                     # Tentar autenticar usuário
@@ -57,7 +59,7 @@ def login_view():
                         dados_completos = matricula_validator.buscar_aluno_por_email(email)
                         
                         # Armazenar informações na sessão
-                        st.session_state["user_email"] = email
+                        st.session_state["user_email"] = email.lower()  # Normalizar para minúsculas
                         st.session_state["user_name"] = user_info['name']  # Novo campo: name
                         st.session_state["user_turma"] = user_info['turma']
                         st.session_state["user_grupo"] = dados_completos['grupo'] if dados_completos else "Grupo não encontrado"
@@ -81,7 +83,7 @@ def login_view():
                     st.rerun()
             
             with col_btn2:
-                if st.button("🔑 Esqueci a Senha", use_container_width=True, type="secondary"):
+                if st.button("🔑 Alterar Senha", use_container_width=True, type="secondary"):
                     st.session_state["show_password_reset"] = True
                     st.rerun()
     

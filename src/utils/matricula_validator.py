@@ -41,7 +41,8 @@ class MatriculaValidator:
         Returns:
             (é_válido, dados_aluno) ou (False, None)
         """
-        if not email or not email.endswith("@sou.inteli.edu.br"):
+        from .email_validator import is_valid_inteli_email
+        if not email or not is_valid_inteli_email(email):
             return False, None
         
         # Buscar o usuário nos dados de usuários
@@ -133,8 +134,9 @@ class MatriculaValidator:
     
     def buscar_aluno_por_email(self, email: str) -> Optional[Dict]:
         """Busca dados completos de um aluno por email"""
-        if email in self.usuarios_data:
-            usuario = self.usuarios_data[email]
+        email_normalizado = email.lower()
+        if email_normalizado in self.usuarios_data:
+            usuario = self.usuarios_data[email_normalizado]
             if usuario.get('id'):  # Apenas alunos
                 grupo = self._encontrar_grupo_por_id(usuario.get('turma'), usuario.get('id'))
                 return {
@@ -142,7 +144,7 @@ class MatriculaValidator:
                     'grupo': grupo,
                     'id': usuario.get('id'),
                     'nome': usuario.get('name'),
-                    'email': email,
+                    'email': email_normalizado,
                     'passwd': usuario.get('passwd', '')
                 }
         return None

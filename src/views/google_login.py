@@ -20,18 +20,21 @@ google_auth = OAuth2Component(
 )
 
 def google_login():
-    st.write("## Login com Google (somente @sou.inteli.edu.br)")
+    from src.utils.email_validator import get_allowed_domains_text
+    st.write(f"## Login com Google (somente {get_allowed_domains_text()})")
     result = google_auth.authorize_button("Login com Google", key="google_login")
     if result and "token" in result:
         userinfo = google_auth.get_user_info(result["token"], user_info_endpoint="https://openidconnect.googleapis.com/v1/userinfo")
         email = userinfo.get("email", "")
-        if email.endswith("@sou.inteli.edu.br"):
+        from src.utils.email_validator import is_valid_inteli_email
+        if is_valid_inteli_email(email):
             st.success(f"Bem-vindo, {userinfo.get('name', email)}!")
             st.session_state["user_email"] = email
             st.session_state["user_name"] = userinfo.get("name", "")
             return True
         else:
-            st.error("Apenas emails @sou.inteli.edu.br são permitidos.")
+            from src.utils.email_validator import get_allowed_domains_text
+            st.error(f"Apenas emails {get_allowed_domains_text()} são permitidos.")
             return False
     return False
 

@@ -24,7 +24,7 @@ O aplicativo será aberto automaticamente em: `http://localhost:8501`
 ## 🔐 Primeiro Acesso
 
 ### Opção 1: Usar Usuários de Teste
-- **Email**: `aluno.teste@sou.inteli.edu.br`
+- **Email**: `aluno.teste@sou.inteli.edu.br` (alunos) ou `professor.teste@prof.inteli.edu.br` (professores)
 - **Senha**: `123456`
 - **Turma**: T13
 - **Grupo**: Grupo 1
@@ -32,7 +32,7 @@ O aplicativo será aberto automaticamente em: `http://localhost:8501`
 ### Opção 2: Criar Novo Cadastro
 1. Clique em "📝 Novo Cadastro"
 2. Preencha suas informações:
-   - Email institucional (@sou.inteli.edu.br)
+   - Email institucional (@sou.inteli.edu.br ou @prof.inteli.edu.br)
    - Nome completo
    - Senha (mínimo 6 caracteres)
    - Turma (T09-T20)
@@ -147,7 +147,7 @@ streamlit run app.py --server.port 8502
 ## 🔒 Segurança
 
 - **Senhas**: Criptografadas com bcrypt
-- **Emails**: Apenas institucionais (@sou.inteli.edu.br)
+- **Emails**: Apenas institucionais (@sou.inteli.edu.br para alunos, @prof.inteli.edu.br para professores)
 - **Sessão**: Gerenciada pelo Streamlit
 - **Dados**: Armazenados localmente em JSON
 

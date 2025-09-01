@@ -7,8 +7,9 @@ from src.utils.supabase_storage import upload_json_to_bucket, file_exists_in_buc
 def cadastro_usuario():
 
     st.title("Cadastro de Novo Usuário")
-    st.info("Cadastre-se usando seu email institucional @sou.inteli.edu.br")
-    email = st.text_input("Email (@sou.inteli.edu.br)")
+    from src.utils.email_validator import get_allowed_domains_text
+    st.info(f"Cadastre-se usando seu email institucional {get_allowed_domains_text()}")
+    email = st.text_input(f"Email ({get_allowed_domains_text()})")
     username = st.text_input("Nome de usuário")
     senha = st.text_input("Senha", type="password")
     senha_confirma = st.text_input("Confirme a senha", type="password")
@@ -17,8 +18,9 @@ def cadastro_usuario():
         if not email or not username or not senha or not senha_confirma:
             st.error("Preencha todos os campos.")
             return
-        if not email.endswith("@sou.inteli.edu.br"):
-            st.error("Use apenas email institucional @sou.inteli.edu.br.")
+        from src.utils.email_validator import is_valid_inteli_email, get_allowed_domains_text
+        if not is_valid_inteli_email(email):
+            st.error(f"Use apenas email institucional {get_allowed_domains_text()}.")
             return
         nome_arquivo = email.split("@")[0] + ".json"
         if file_exists_in_bucket(bucket, nome_arquivo):

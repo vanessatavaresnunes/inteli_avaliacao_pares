@@ -37,7 +37,6 @@ class AvaliacaoView:
         with col4:
             if st.button("🚪 Logout", type="secondary", use_container_width=True):
                 self.controller.fazer_logout()
-                st.rerun()
         
         st.markdown("---")
         
@@ -79,9 +78,10 @@ class AvaliacaoView:
             self.controller.inicializar_avaliacao_aluno(aluno)
         # Calcular pontos restantes por eixo (N+1 - soma atual)
         nomes_eixos = self.controller.obter_nomes_eixos()
-        config = self.controller.obter_configuracao()
         num_avaliados = len(alunos_time)
-        pontos_totais = num_avaliados + 1
+        num_integrantes_grupo = num_avaliados + 1  # +1 para incluir o avaliador
+        config = self.controller.obter_configuracao_notas(num_integrantes_grupo)
+        pontos_totais = num_integrantes_grupo
         # Soma das notas já distribuídas para cada eixo
         soma_por_eixo = [0 for _ in nomes_eixos]
         for aluno in alunos_time:
@@ -189,7 +189,7 @@ class AvaliacaoView:
         """Renderiza o botão de salvar avaliações"""
         st.markdown("---")
 
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2 = st.columns([1, 1])
 
         with col1:
             if st.button("Preencher para Teste"):
@@ -217,6 +217,8 @@ class AvaliacaoView:
                     st.rerun()
                 else:
                     st.error(mensagem)
+        
+
 
     def _obter_avaliacoes_feitas(self):
         """Obtém as avaliações feitas pelo usuário atual em formato estruturado para exibição."""
@@ -239,6 +241,9 @@ class AvaliacaoView:
 
     def _renderizar_tela_sucesso(self):
         """Renderiza a tela de sucesso após salvar avaliações."""
+        # Processar emails pendentes em background
+        self.controller.processar_emails_pendentes()
+        
         st.title("✅ Avaliações salvas com sucesso!")
         
         # Obter dados do usuário com validações

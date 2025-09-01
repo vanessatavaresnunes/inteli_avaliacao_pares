@@ -1,4 +1,5 @@
 {
     "nota_minima": 0,
-    "nota_maxima": 3
+    "regra_nota_maxima": "N-1",
+    "descricao_regra": "A nota máxima é calculada dinamicamente como N-1, onde N é o número de integrantes do grupo, permitindo distribuição equilibrada dos pontos"
 }

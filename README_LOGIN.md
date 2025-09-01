@@ -7,7 +7,7 @@ Este sistema implementa um fluxo completo de autenticação para o Sistema de Av
 ## Funcionalidades
 
 ### 🔐 Login
-- **Email institucional**: Apenas emails @sou.inteli.edu.br são aceitos
+- **Email institucional**: Apenas emails @sou.inteli.edu.br (alunos) e @prof.inteli.edu.br (professores) são aceitos
 - **Senha**: Sistema de autenticação seguro com senhas criptografadas
 - **Redirecionamento automático**: Após login, o usuário é direcionado diretamente para sua turma e grupo
 
@@ -47,7 +47,7 @@ data/
 1. Acesse o sistema
 2. Clique em "📝 Novo Cadastro"
 3. Preencha suas informações:
-   - Email institucional (@sou.inteli.edu.br)
+   - Email institucional (@sou.inteli.edu.br ou @prof.inteli.edu.br)
    - Nome completo
    - Senha (mínimo 6 caracteres)
    - Turma (T09-T20)
@@ -75,7 +75,7 @@ Para testar o sistema, foram criados usuários de exemplo:
 - **Turma**: T13
 - **Grupo**: Grupo 1
 
-- **Email**: `professor.teste@sou.inteli.edu.br`
+- **Email**: `professor.teste@prof.inteli.edu.br`
 - **Senha**: `123456`
 - **Turma**: T13
 - **Grupo**: Grupo 2

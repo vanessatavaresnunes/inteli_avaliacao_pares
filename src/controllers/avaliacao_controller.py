@@ -20,20 +20,22 @@ class AvaliacaoController:
     
     def inicializar_sessao(self):
         """Inicializa a sessão do Streamlit se necessário"""
-        if 'avaliacoes_temp' not in st.session_state:
-            st.session_state.avaliacoes_temp = {}
-        
-        if 'logado' not in st.session_state:
-            st.session_state.logado = False
+        # Só inicializar se o usuário estiver autenticado
+        if st.session_state.get('user_authenticated', False):
+            if 'avaliacoes_temp' not in st.session_state:
+                st.session_state.avaliacoes_temp = {}
+            
+            if 'logado' not in st.session_state:
+                st.session_state.logado = False
 
-        if 'validation_messages' not in st.session_state:
-            st.session_state.validation_messages = {
-                'soma_notas': {'is_valid': True, 'messages': [], 'details': {}},
-                'notas_individuais': {'is_valid': True, 'messages': []},
-                'feedbacks_preenchidos': {'is_valid': True, 'messages': []},
-                'feedbacks_unicos': {'is_valid': True, 'messages': []},
-                'conteudo_feedbacks': {'is_valid': True, 'messages': []}
-            }
+            if 'validation_messages' not in st.session_state:
+                st.session_state.validation_messages = {
+                    'soma_notas': {'is_valid': True, 'messages': [], 'details': {}},
+                    'notas_individuais': {'is_valid': True, 'messages': []},
+                    'feedbacks_preenchidos': {'is_valid': True, 'messages': []},
+                    'feedbacks_unicos': {'is_valid': True, 'messages': []},
+                    'conteudo_feedbacks': {'is_valid': True, 'messages': []}
+                }
     
     def fazer_login(self, time: str, aluno: str, senha: str, turma: str = None) -> bool:
         """
@@ -62,15 +64,48 @@ class AvaliacaoController:
     
     def fazer_logout(self):
         """Realiza o logout do usuário"""
+        # Limpar todas as variáveis de autenticação
         st.session_state.logado = False
+        st.session_state.user_authenticated = False
+        
+        # Limpar dados do usuário
         if 'aluno_atual' in st.session_state:
             del st.session_state.aluno_atual
         if 'aluno_id_atual' in st.session_state:
             del st.session_state.aluno_id_atual
         if 'time_atual' in st.session_state:
             del st.session_state.time_atual
+        if 'turma_atual' in st.session_state:
+            del st.session_state.turma_atual
         if 'avaliacoes_temp' in st.session_state:
             del st.session_state.avaliacoes_temp
+        
+        # Limpar dados de autenticação
+        if 'user_email' in st.session_state:
+            del st.session_state.user_email
+        if 'user_name' in st.session_state:
+            del st.session_state.user_name
+        if 'user_turma' in st.session_state:
+            del st.session_state.user_turma
+        if 'user_grupo' in st.session_state:
+            del st.session_state.user_grupo
+        
+        # Limpar outras variáveis de sessão
+        if 'sprint_atual' in st.session_state:
+            del st.session_state.sprint_atual
+        if 'validation_messages' in st.session_state:
+            del st.session_state.validation_messages
+        
+        # Registrar logout na auditoria se possível
+        try:
+            if hasattr(self, 'matricula_validator'):
+                # Tentar registrar logout (email pode não estar mais disponível)
+                pass
+        except:
+            pass
+        
+        # Forçar rerun para voltar à tela de login
+        st.rerun()
     
     def esta_logado(self) -> bool:
         """
@@ -179,13 +214,22 @@ class AvaliacaoController:
         """
         alunos_time = self.obter_alunos_para_avaliar()
         nomes_eixos = self.obter_nomes_eixos()
-        config = self.obter_configuracao()
+        
+        # Calcular número total de integrantes no grupo (incluindo o avaliador)
+        num_integrantes_grupo = len(alunos_time) + 1
+        
+        # Usar a nova configuração dinâmica de notas com o número correto de integrantes
+        config_notas = self.obter_configuracao_notas(num_integrantes_grupo)
+        
+        # Criar config compatível com o modelo antigo
+        config = {
+            'nota_minima': config_notas['nota_minima'],
+            'nota_maxima': config_notas['nota_maxima']
+        }
 
         # Garante que a avaliação temporária exista para todos os alunos
         for aluno in alunos_time:
             self.inicializar_avaliacao_aluno(aluno)
-
-        num_integrantes_grupo = len(alunos_time) + 1
 
         # Initialize validation messages structure
         st.session_state.validation_messages = {
@@ -324,7 +368,17 @@ class AvaliacaoController:
             # Limpar dados temporários
             del st.session_state.avaliacoes_temp
 
-            return True, f"Avaliações salvas com sucesso! Arquivo: {arquivo}"
+            # Preparar envio de email em background (não bloqueia o redirecionamento)
+            email_usuario = st.session_state.get('user_email')
+            if email_usuario:
+                # Armazenar informações para envio de email em background
+                st.session_state['email_pendente'] = {
+                    'email': email_usuario,
+                    'id_avaliador': aluno_id_atual
+                }
+                return True, f"Avaliações salvas com sucesso! Email será enviado para {email_usuario}"
+            else:
+                return True, f"Avaliações salvas com sucesso! (Aviso: Email não será enviado - Email do usuário não encontrado)"
 
         except Exception as e:
             return False, f"Erro ao salvar: {str(e)}"
@@ -373,6 +427,117 @@ class AvaliacaoController:
         """Obtém configurações do sistema"""
         return self.usuario_model.obter_configuracao()
     
+    def obter_configuracao_notas(self, num_integrantes_grupo: int = None):
+        """
+        Obtém configuração de notas com nota máxima calculada dinamicamente
+        
+        Args:
+            num_integrantes_grupo: Número de integrantes no grupo
+            
+        Returns:
+            Dicionário com nota_minima e nota_maxima
+        """
+        return self.usuario_model.obter_configuracao_notas(num_integrantes_grupo)
+    
+    def enviar_avaliacoes_por_email(self, email_usuario: str) -> tuple[bool, str]:
+        """
+        Envia avaliações do usuário por email
+        
+        Args:
+            email_usuario: Email do usuário para envio
+            
+        Returns:
+            Tupla com (sucesso, mensagem)
+        """
+        try:
+            # Obter dados do usuário
+            nome_usuario = st.session_state.get('user_name', 'Usuário')
+            grupo_usuario = st.session_state.get('time_atual', 'N/A')
+            sprint_atual = st.session_state.get('sprint_atual', 'Sprint Atual')
+            aluno_id_atual = st.session_state.get('aluno_id_atual')
+            
+            if not aluno_id_atual:
+                return False, "ID do usuário não encontrado. Faça login novamente."
+            
+            # Carregar avaliações do usuário
+            df = self.avaliacao_model.carregar_dados()
+            avaliacoes_usuario = df[df['id_avaliador'] == aluno_id_atual]
+            
+            if avaliacoes_usuario.empty:
+                return False, "Nenhuma avaliação encontrada para enviar por email."
+            
+            # Preparar dados para o email - transformar estrutura de dados
+            avaliacoes_data = {
+                'sprint': sprint_atual,
+                'grupo': grupo_usuario,
+                'avaliacoes': []
+            }
+            
+            # Agrupar avaliações por aluno avaliado
+            avaliacoes_por_aluno = {}
+            for _, row in avaliacoes_usuario.iterrows():
+                id_avaliado = row.get('id_avaliado')
+                nome_avaliado = row.get('nome_avaliado', 'Aluno')
+                eixo = row.get('eixo', '')
+                nota = row.get('nota', 0)
+                feedback = row.get('feedback', 'N/A')
+                
+                if id_avaliado not in avaliacoes_por_aluno:
+                    avaliacoes_por_aluno[id_avaliado] = {
+                        'aluno_avaliado': nome_avaliado,
+                        'nota_eixo1': 0,
+                        'nota_eixo2': 0,
+                        'nota_eixo3': 0,
+                        'feedback_eixo1': 'N/A',
+                        'feedback_eixo2': 'N/A',
+                        'feedback_eixo3': 'N/A'
+                    }
+                
+                # Mapear eixo para o campo correto (case-insensitive)
+                eixo_lower = eixo.lower()
+                if 'entregas' in eixo_lower and 'reais' in eixo_lower:
+                    avaliacoes_por_aluno[id_avaliado]['nota_eixo1'] = nota
+                    avaliacoes_por_aluno[id_avaliado]['feedback_eixo1'] = feedback
+                elif 'valor' in eixo_lower and 'percebido' in eixo_lower:
+                    avaliacoes_por_aluno[id_avaliado]['nota_eixo2'] = nota
+                    avaliacoes_por_aluno[id_avaliado]['feedback_eixo2'] = feedback
+                elif 'caixa' in eixo_lower and 'ferramentas' in eixo_lower:
+                    avaliacoes_por_aluno[id_avaliado]['nota_eixo3'] = nota
+                    avaliacoes_por_aluno[id_avaliado]['feedback_eixo3'] = feedback
+            
+            # Converter para lista
+            avaliacoes_data['avaliacoes'] = list(avaliacoes_por_aluno.values())
+            
+            # Enviar email
+            from src.utils.email_service import EmailService
+            email_service = EmailService()
+            success, message = email_service.enviar_avaliacoes(
+                email_usuario, nome_usuario, avaliacoes_data
+            )
+            
+            return success, message
+            
+        except Exception as e:
+            return False, f"Erro ao preparar email: {str(e)}"
+    
+    def processar_emails_pendentes(self):
+        """
+        Processa emails pendentes em background
+        """
+        if 'email_pendente' in st.session_state:
+            email_info = st.session_state['email_pendente']
+            try:
+                sucesso, mensagem = self.enviar_avaliacoes_por_email(email_info['email'])
+                if sucesso:
+                    st.success(f"📧 Email enviado com sucesso para {email_info['email']}")
+                else:
+                    st.warning(f"⚠️ Email não foi enviado: {mensagem}")
+            except Exception as e:
+                st.warning(f"⚠️ Erro ao enviar email: {str(e)}")
+            finally:
+                # Limpar email pendente
+                del st.session_state['email_pendente']
+    
     def obter_eixos(self) -> List[Dict[str, any]]:
         """Obtém lista de eixos de avaliação com nome, descrição e observações"""
         return self.usuario_model.obter_eixos()
@@ -409,6 +574,10 @@ class AvaliacaoController:
             turma: Nome da turma (ex: T13)
             grupo: Nome do grupo (ex: Grupo 1)
         """
+        # Verificar se o usuário está autenticado antes de configurar
+        if not st.session_state.get('user_authenticated', False):
+            return
+        
         # Configurar turma no modelo de usuário
         self.usuario_model.set_turma(turma)
         

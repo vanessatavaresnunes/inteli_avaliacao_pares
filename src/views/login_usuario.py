@@ -6,15 +6,17 @@ import tempfile
 
 def login_usuario():
     st.title("Login do Usuário")
-    email = st.text_input("Email (@sou.inteli.edu.br)")
+    from src.utils.email_validator import get_allowed_domains_text
+    email = st.text_input(f"Email ({get_allowed_domains_text()})")
     senha = st.text_input("Senha", type="password")
     bucket = "usuarios_inteli"
     if st.button("Entrar"):
         if not email or not senha:
             st.error("Preencha todos os campos.")
             return False
-        if not email.endswith("@sou.inteli.edu.br"):
-            st.error("Use apenas email institucional @sou.inteli.edu.br.")
+        from src.utils.email_validator import is_valid_inteli_email, get_allowed_domains_text
+        if not is_valid_inteli_email(email):
+            st.error(f"Use apenas email institucional {get_allowed_domains_text()}.")
             return False
         nome_arquivo = email.split("@")[0] + ".json"
         if not file_exists_in_bucket(bucket, nome_arquivo):

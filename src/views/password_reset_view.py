@@ -7,7 +7,7 @@ def password_reset_view():
     # Inicializar storage de usuários
     user_storage = UserStorage()
     
-    st.title("🔑 Redefinir Senha")
+    st.title("🔑 Alterar Senha")
     st.markdown("---")
     
     # Botão para voltar ao login
@@ -15,8 +15,8 @@ def password_reset_view():
         st.session_state["show_password_reset"] = False
         st.rerun()
     
-    st.markdown("### Redefinir sua senha")
-    st.info("🔐 Digite seu email institucional e uma nova senha")
+    st.markdown("### Alterar sua senha")
+    st.info("🔐 Digite seu email institucional, senha atual e nova senha")
     
     # Formulário de redefinição
     with st.form("password_reset_form"):
@@ -24,6 +24,13 @@ def password_reset_view():
             "📧 Email Institucional",
             placeholder="seu.nome@sou.inteli.edu.br",
             help="Digite seu email completo do Inteli"
+        )
+        
+        current_password = st.text_input(
+            "🔒 Senha Atual",
+            type="password",
+            placeholder="Digite sua senha atual",
+            help="Digite a senha que você está usando atualmente"
         )
         
         new_password = st.text_input(
@@ -40,15 +47,21 @@ def password_reset_view():
             help="Confirme sua nova senha"
         )
         
-        submitted = st.form_submit_button("🔄 Atualizar Senha", use_container_width=True)
+        submitted = st.form_submit_button("🔄 Alterar Senha", use_container_width=True)
         
         if submitted:
-            if not all([email, new_password, confirm_password]):
+            if not all([email, current_password, new_password, confirm_password]):
                 st.error("❌ Preencha todos os campos!")
                 return False
             
-            if not email.endswith("@sou.inteli.edu.br"):
-                st.error("❌ Use apenas email institucional @sou.inteli.edu.br!")
+            from src.utils.email_validator import is_valid_inteli_email, get_allowed_domains_text
+            if not is_valid_inteli_email(email):
+                st.error(f"❌ Use apenas email institucional {get_allowed_domains_text()}!")
+                return False
+            
+            # Verificar se a senha atual está correta
+            if not user_storage.authenticate_user(email, current_password):
+                st.error("❌ Senha atual incorreta!")
                 return False
             
             if new_password != confirm_password:
@@ -69,13 +82,13 @@ def password_reset_view():
                 # Limpar formulário
                 st.session_state["show_password_reset"] = False
                 
-                # Mostrar botão para ir ao login
-                if st.button("🔐 Ir para o Login", type="primary"):
-                    st.rerun()
-                
                 return True
             else:
                 st.error(f"❌ {message}")
                 return False
+    
+    # Mensagem informativa sobre esquecimento de senha
+    st.markdown("---")
+    st.info("💡 **Esqueceu sua senha?** Entre em contato com o Professor Orientador para redefinir seu acesso ao sistema.")
     
     return False

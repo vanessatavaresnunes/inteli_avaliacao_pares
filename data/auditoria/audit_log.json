@@ -104,5 +104,285 @@
     "email": "gabriel.nascimento@sou.inteli.edu.br",
     "ip_address": "N/A",
     "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T10:35:59.504533",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:04.932803",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:06.958752",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:07.482129",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:07.903597",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:10.827923",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:12.849139",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:13.293971",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:13.483203",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:13.959974",
+    "acao": "LOGIN_FALHA",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T10:36:53.783472",
+    "acao": "LOGIN",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T10:50:12.314457",
+    "acao": "LOGIN",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T10:56:30.751119",
+    "acao": "LOGIN",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T10:59:18.390326",
+    "acao": "LOGIN",
+    "email": "gabriel.nascimento2@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:01:06.860357",
+    "acao": "CADASTRO",
+    "email": "renan.oliveira@sou.inteli.edu.br",
+    "username": "Renan Feitosa Oliveira",
+    "turma": "T09",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:01:20.855314",
+    "acao": "LOGIN",
+    "email": "renan.oliveira@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:07:06.931210",
+    "acao": "LOGIN",
+    "email": "renan.oliveira@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:09:31.047478",
+    "acao": "ALTERACAO_SENHA",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:16:20.023849",
+    "acao": "LOGIN_FALHA",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "motivo": "Usuário sem senha cadastrada",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T11:16:20.425958",
+    "acao": "ALTERACAO_SENHA",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:18:39.526585",
+    "acao": "LOGIN_FALHA",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "motivo": "Usuário sem senha cadastrada",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T11:18:59.313675",
+    "acao": "CADASTRO",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "username": "Giacomo Zema Matizonkas",
+    "turma": "T13",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:19:18.866392",
+    "acao": "LOGIN",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:19:19.219281",
+    "acao": "ALTERACAO_SENHA",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T11:19:29.900558",
+    "acao": "LOGIN",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T13:27:40.663076",
+    "acao": "CADASTRO",
+    "email": "karine.paixao@sou.inteli.edu.br",
+    "username": "Karine Victoria Rosa da Paixao",
+    "turma": "T13",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T13:27:52.331287",
+    "acao": "LOGIN",
+    "email": "karine.paixao@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T13:46:49.367292",
+    "acao": "LOGIN_FALHA",
+    "email": " karine.paixao@sou.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-09-01T13:47:01.199925",
+    "acao": "LOGIN",
+    "email": "karine.paixao@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T15:08:41.992496",
+    "acao": "LOGIN",
+    "email": "karine.paixao@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:03:54.804280",
+    "acao": "CADASTRO",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "username": "Ana Carolina de Jesus Pacheco da Silva",
+    "turma": "T13",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:04:07.982608",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:08:46.090694",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:16:02.952111",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:27:22.395862",
+    "acao": "CADASTRO",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "username": "Ana Carolina de Jesus Pacheco da Silva",
+    "turma": "T13",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-01T16:27:32.580240",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
   }
 ]

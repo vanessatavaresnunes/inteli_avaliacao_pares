@@ -19,7 +19,8 @@ def cadastro_view():
         st.rerun()
     
     st.markdown("### Informações Pessoais")
-    st.info("🔐 Cadastre-se usando seu email institucional @sou.inteli.edu.br")
+    from src.utils.email_validator import get_allowed_domains_text
+    st.info(f"🔐 Cadastre-se usando seu email institucional {get_allowed_domains_text()}")
     
     # Inicializar variáveis de sessão
     if 'nome_usuario_encontrado' not in st.session_state:
@@ -34,7 +35,8 @@ def cadastro_view():
     )
     
     # Buscar nome do usuário quando email for digitado
-    if email and email.endswith("@sou.inteli.edu.br"):
+    from src.utils.email_validator import is_valid_inteli_email
+    if email and is_valid_inteli_email(email):
         user_info = user_storage.get_user_info(email)
         if user_info and user_info.get('name'):
             st.session_state.nome_usuario_encontrado = user_info.get('name')
@@ -152,8 +154,9 @@ def cadastro_view():
                 return False
             
             # Validar formato do email
-            if not email.endswith("@sou.inteli.edu.br"):
-                st.error("❌ Use apenas email institucional @sou.inteli.edu.br")
+            from src.utils.email_validator import is_valid_inteli_email, get_allowed_domains_text
+            if not is_valid_inteli_email(email):
+                st.error(f"❌ Use apenas email institucional {get_allowed_domains_text()}")
                 return False
             
             # Validar tamanho da senha (6-8 caracteres)

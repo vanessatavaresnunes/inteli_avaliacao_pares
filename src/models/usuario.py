@@ -121,7 +121,69 @@ class UsuarioModel:
                 return json.load(arquivo)
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Erro ao carregar config.json: {e}")
-            return {"nota_minima": 0, "nota_maxima": 3}
+            return {"nota_minima": 0, "regra_nota_maxima": "N/2"}
+    
+    def calcular_nota_maxima(self, num_integrantes_grupo: int) -> int:
+        """
+        Calcula a nota máxima dinamicamente baseada no número de integrantes do grupo.
+        
+        Args:
+            num_integrantes_grupo: Número de integrantes no grupo
+            
+        Returns:
+            Nota máxima permitida para o grupo
+        """
+        config = self._carregar_configuracao()
+        regra = config.get('regra_nota_maxima', 'N/2')
+        
+        if regra == 'N/2':
+            return max(1, num_integrantes_grupo // 2)
+        elif regra == 'N':
+            return num_integrantes_grupo
+        elif regra == 'N-1':
+            return max(1, num_integrantes_grupo - 1)
+        else:
+            # Fallback para regras customizadas ou valor padrão
+            try:
+                # Tenta avaliar expressões matemáticas simples como "N/2", "N-1", etc.
+                import re
+                if 'N' in regra:
+                    # Substitui N pelo número de integrantes e avalia
+                    expressao = regra.replace('N', str(num_integrantes_grupo))
+                    # Remove caracteres perigosos e avalia apenas operações básicas
+                    if re.match(r'^[\d\+\-\*\/\(\)\s]+$', expressao):
+                        return max(1, int(eval(expressao)))
+                    else:
+                        raise ValueError("Expressão inválida")
+                else:
+                    # Se não tem N, tenta converter para int
+                    return max(1, int(regra))
+            except (ValueError, SyntaxError):
+                # Fallback para valor padrão
+                return max(1, num_integrantes_grupo // 2)
+    
+    def obter_configuracao_notas(self, num_integrantes_grupo: int = None) -> Dict:
+        """
+        Retorna configuração de notas com nota máxima calculada dinamicamente.
+        
+        Args:
+            num_integrantes_grupo: Número de integrantes no grupo (opcional)
+            
+        Returns:
+            Dicionário com nota_minima e nota_maxima
+        """
+        config = self._carregar_configuracao()
+        
+        if num_integrantes_grupo is not None:
+            nota_maxima = self.calcular_nota_maxima(num_integrantes_grupo)
+        else:
+            # Fallback para valor padrão se não especificado
+            nota_maxima = 3
+        
+        return {
+            "nota_minima": config.get('nota_minima', 0),
+            "nota_maxima": nota_maxima
+        }
     
     def obter_times(self, turma: str = None) -> List[str]:
         """Retorna lista de times disponíveis para a turma informada ou atual."""
