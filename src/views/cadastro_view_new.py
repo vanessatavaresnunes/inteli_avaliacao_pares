@@ -189,59 +189,64 @@ def cadastro_view():
             # Validações feitas apenas quando o formulário é submetido
             # (aqui os valores dos campos estão disponíveis)
             
+            # Variável para controlar se deve processar o cadastro
+            pode_processar = True
+            
             # Validar se todos os campos obrigatórios foram preenchidos
             if not all([email, password, password_confirm]):
                 st.error("❌ Preencha todos os campos obrigatórios!")
-                return False
+                pode_processar = False
             
             # Validar formato do email
             from src.utils.email_validator import is_valid_inteli_email, get_allowed_domains_text
-            if not is_valid_inteli_email(email):
+            if pode_processar and not is_valid_inteli_email(email):
                 st.error(f"❌ Use apenas email institucional {get_allowed_domains_text()}")
-                return False
+                pode_processar = False
             
             # Validar tamanho da senha (6-8 caracteres)
-            if len(password) < 6 or len(password) > 8:
+            if pode_processar and (len(password) < 6 or len(password) > 8):
                 st.error("❌ Senha deve ter entre 6 e 8 caracteres")
-                return False
+                pode_processar = False
             
             # Validar se as senhas coincidem
-            if password != password_confirm:
+            if pode_processar and password != password_confirm:
                 st.error("❌ As senhas não coincidem")
-                return False
+                pode_processar = False
             
             # Verificar se o email é válido na matrícula antes de processar
-            if not email_valido or not dados_matricula:
+            if pode_processar and (not email_valido or not dados_matricula):
                 st.error("❌ Email não validado na matrícula oficial. Verifique se o email está correto.")
-                return False
+                pode_processar = False
             
-            # Usar dados da matrícula oficial
-            turma = dados_matricula['turma']
-            grupo = dados_matricula['grupo']
-            
-            # Usar nome encontrado no usuarios.json se disponível, senão usar o digitado
-            nome_final = st.session_state.nome_usuario_encontrado if st.session_state.nome_usuario_encontrado else username
-            
-            if usuario_pre_cadastrado:
-                # Ativar usuário pré-cadastrado
-                success, message = user_storage.create_user(email, dados_matricula['nome'], password, turma, grupo)  # Novo campo: nome
-            else:
-                # Criar novo usuário
-                success, message = user_storage.create_user(email, nome_final, password, turma, grupo)
-            
-            if success:
-                # Armazenar dados do sucesso na sessão para mostrar fora do formulário
-                st.session_state["cadastro_sucesso"] = {
-                    "nome": nome_final,
-                    "email": email,
-                    "turma": turma,
-                    "grupo": grupo
-                }
-                # NÃO definir show_cadastro = False aqui, para manter na tela de cadastro
-                st.rerun()
-                return True
-            else:
-                st.error(f"❌ {message}")
-                return False
+            # Só processar o cadastro se todas as validações passaram
+            if pode_processar:
+                # Usar dados da matrícula oficial
+                turma = dados_matricula['turma']
+                grupo = dados_matricula['grupo']
+                
+                # Usar nome encontrado no usuarios.json se disponível, senão usar o digitado
+                nome_final = st.session_state.nome_usuario_encontrado if st.session_state.nome_usuario_encontrado else username
+                
+                if usuario_pre_cadastrado:
+                    # Ativar usuário pré-cadastrado
+                    success, message = user_storage.create_user(email, dados_matricula['nome'], password, turma, grupo)  # Novo campo: nome
+                else:
+                    # Criar novo usuário
+                    success, message = user_storage.create_user(email, nome_final, password, turma, grupo)
+                
+                if success:
+                    # Armazenar dados do sucesso na sessão para mostrar fora do formulário
+                    st.session_state["cadastro_sucesso"] = {
+                        "nome": nome_final,
+                        "email": email,
+                        "turma": turma,
+                        "grupo": grupo
+                    }
+                    # NÃO definir show_cadastro = False aqui, para manter na tela de cadastro
+                    st.rerun()
+                    return True
+                else:
+                    st.error(f"❌ {message}")
+                    return False
     
     return False
