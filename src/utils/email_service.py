@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 import json
 import os
 import time
+import random
 from typing import Dict, List, Any
 from dotenv import load_dotenv
 
@@ -281,24 +282,86 @@ class EmailService:
         
         return html
     
-    def _enviar_email(self, msg: MIMEMultipart) -> None:
+    def _enviar_email(self, msg: MIMEMultipart, max_retries: int = 3) -> None:
         """
-        Envia o email via SMTP
+        Envia o email via SMTP com sistema de retry
         
         Args:
             msg: Mensagem de email preparada
+            max_retries: Número máximo de tentativas
         """
-        # Aguardar 0.5 segundos antes de enviar o email
-        time.sleep(0.5)
+        last_exception = None
         
-        server = smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port'])
+        for attempt in range(max_retries):
+            try:
+                # Aguardar com delay progressivo (0.5s, 1s, 2s)
+                delay = 0.5 + (attempt * 0.5) + random.uniform(0, 0.5)
+                print(f"📧 Tentativa {attempt + 1}/{max_retries} - Aguardando {delay:.1f}s...")
+                time.sleep(delay)
+                
+                # Criar conexão SMTP
+                server = smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port'])
+                server.set_debuglevel(0)  # Desabilitar debug para produção
+                
+                # Configurar timeout
+                server.timeout = 30
+                
+                if self.config['use_tls']:
+                    context = ssl.create_default_context()
+                    context.check_hostname = False
+                    context.verify_mode = ssl.CERT_NONE
+                    server.starttls(context=context)
+                
+                # Login com timeout
+                server.login(self.config['sender_email'], self.config['sender_password'])
+                
+                # Enviar mensagem
+                server.send_message(msg)
+                server.quit()
+                
+                print(f"✅ Email enviado com sucesso na tentativa {attempt + 1}")
+                return  # Sucesso, sair da função
+                
+            except smtplib.SMTPAuthenticationError as e:
+                print(f"❌ Erro de autenticação (tentativa {attempt + 1}): {str(e)}")
+                last_exception = e
+                if "temporary system problem" in str(e).lower():
+                    print("🔄 Problema temporário detectado, tentando novamente...")
+                    continue
+                else:
+                    raise e  # Erro de autenticação permanente
+                    
+            except smtplib.SMTPRecipientsRefused as e:
+                print(f"❌ Destinatário recusado (tentativa {attempt + 1}): {str(e)}")
+                raise e  # Não tentar novamente para este erro
+                
+            except smtplib.SMTPServerDisconnected as e:
+                print(f"❌ Servidor desconectado (tentativa {attempt + 1}): {str(e)}")
+                last_exception = e
+                continue
+                
+            except smtplib.SMTPException as e:
+                print(f"❌ Erro SMTP (tentativa {attempt + 1}): {str(e)}")
+                last_exception = e
+                if "temporary" in str(e).lower() or "try again" in str(e).lower():
+                    print("🔄 Erro temporário detectado, tentando novamente...")
+                    continue
+                else:
+                    raise e
+                    
+            except Exception as e:
+                print(f"❌ Erro inesperado (tentativa {attempt + 1}): {str(e)}")
+                last_exception = e
+                continue
+                
+            finally:
+                try:
+                    server.quit()
+                except:
+                    pass
         
-        if self.config['use_tls']:
-            server.starttls(context=ssl.create_default_context())
-        
-        server.login(self.config['sender_email'], self.config['sender_password'])
-        server.send_message(msg)
-        server.quit()
+        # Se chegou aqui, todas as tentativas falharam
+        raise last_exception or Exception("Falha ao enviar email após todas as tentativas")
     
     def enviar_confirmacao_cadastro(self, destinatario: str, nome_usuario: str, turma: str, grupo: str) -> tuple[bool, str]:
         """
@@ -456,21 +519,34 @@ class EmailService:
 
     def testar_conexao(self) -> tuple[bool, str]:
         """
-        Testa a conexão com o servidor SMTP
+        Testa a conexão com o servidor SMTP com retry
         
         Returns:
             Tupla com (sucesso, mensagem)
         """
         try:
+            # Usar o mesmo método de envio, mas sem mensagem
+            print("🔍 Testando conexão SMTP...")
+            
             server = smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port'])
+            server.set_debuglevel(0)
+            server.timeout = 30
             
             if self.config['use_tls']:
-                server.starttls(context=ssl.create_default_context())
+                context = ssl.create_default_context()
+                context.check_hostname = False
+                context.verify_mode = ssl.CERT_NONE
+                server.starttls(context=context)
             
             server.login(self.config['sender_email'], self.config['sender_password'])
             server.quit()
             
-            return True, "Conexão SMTP testada com sucesso!"
+            return True, "✅ Conexão SMTP testada com sucesso!"
             
+        except smtplib.SMTPAuthenticationError as e:
+            if "temporary system problem" in str(e).lower():
+                return False, f"⚠️ Problema temporário no Gmail: {str(e)}"
+            else:
+                return False, f"❌ Erro de autenticação: {str(e)}"
         except Exception as e:
-            return False, f"Erro na conexão SMTP: {str(e)}"
+            return False, f"❌ Erro na conexão SMTP: {str(e)}"
