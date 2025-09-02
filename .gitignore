@@ -55,5 +55,13 @@ Thumbs.db
 *.log
 
 
-#envs
+# Environment variables and sensitive config files
 .env
+.env.local
+.env.production
+config/email.env
+config/*.env
+*.env
+
+# Email configuration (contains sensitive credentials)
+config/email_config.json

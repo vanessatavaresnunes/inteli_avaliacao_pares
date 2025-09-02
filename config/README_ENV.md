@@ -32,9 +32,19 @@ O sistema agora usa variáveis de ambiente para configuração de email. O arqui
 
 ## Segurança
 
-- O arquivo `email.env` contém informações sensíveis
-- Adicione `config/email.env` ao `.gitignore` se necessário
-- Use senhas de aplicativo para Gmail
+- ⚠️ **IMPORTANTE**: O arquivo `email.env` contém informações sensíveis e NÃO deve ser commitado no Git
+- O arquivo `config/email.env` já está no `.gitignore` para proteger suas credenciais
+- Use senhas de aplicativo para Gmail (não use sua senha normal)
+- Nunca compartilhe suas credenciais de email
+
+### Como Configurar Gmail com Senha de App:
+
+1. Ative a verificação em duas etapas na sua conta Google
+2. Vá em "Gerenciar sua Conta do Google" > "Segurança"
+3. Em "Como fazer login no Google", clique em "Senhas de app"
+4. Selecione "Email" e "Outro (nome personalizado)"
+5. Digite "Sistema de Avaliação de Pares"
+6. Copie a senha gerada e use no arquivo `email.env`
 
 ## Compatibilidade
 
