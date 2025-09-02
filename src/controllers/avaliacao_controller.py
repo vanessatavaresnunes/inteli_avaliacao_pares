@@ -456,12 +456,28 @@ class AvaliacaoController:
             sprint_atual = st.session_state.get('sprint_atual', 'Sprint Atual')
             aluno_id_atual = st.session_state.get('aluno_id_atual')
             
+            print(f"🔍 DEBUG - Dados do usuário:")
+            print(f"  - Nome: {nome_usuario}")
+            print(f"  - Grupo: {grupo_usuario}")
+            print(f"  - Sprint: {sprint_atual}")
+            print(f"  - ID do aluno: {aluno_id_atual}")
+            print(f"  - Email: {email_usuario}")
+            
             if not aluno_id_atual:
                 return False, "ID do usuário não encontrado. Faça login novamente."
             
             # Carregar avaliações do usuário
             df = self.avaliacao_model.carregar_dados()
+            print(f"🔍 DEBUG - DataFrame carregado:")
+            print(f"  - Total de registros: {len(df)}")
+            print(f"  - Colunas: {list(df.columns) if not df.empty else 'DataFrame vazio'}")
+            
+            if not df.empty:
+                print(f"  - IDs de avaliadores únicos: {df['id_avaliador'].unique() if 'id_avaliador' in df.columns else 'Coluna id_avaliador não encontrada'}")
+                print(f"  - Procurando por ID: {aluno_id_atual}")
+            
             avaliacoes_usuario = df[df['id_avaliador'] == aluno_id_atual]
+            print(f"🔍 DEBUG - Avaliações encontradas para o usuário: {len(avaliacoes_usuario)}")
             
             if avaliacoes_usuario.empty:
                 return False, "Nenhuma avaliação encontrada para enviar por email."

@@ -1,8 +1,0 @@
-{
-    "smtp_server": "smtp.gmail.com",
-    "smtp_port": 587,
-    "sender_email": "vanessa.nunes@prof.inteli.edu.br",
-    "sender_password": "jace gbcs zbpx bzot",
-    "use_tls": true,
-    "app_name": "Sistema de Avaliação de Pares"
-}

@@ -483,5 +483,29 @@
     "email": "afonso.brandao@prof.inteli.edu.br",
     "ip_address": "N/A",
     "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-02T14:11:17.787206",
+    "acao": "CADASTRO",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "username": "Vanessa Tavares Nunes",
+    "turma": "Teste",
+    "grupo": "Grupo",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-02T14:11:33.083863",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-02T14:17:02.836435",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
   }
 ]

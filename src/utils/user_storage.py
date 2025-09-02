@@ -68,6 +68,16 @@ class UserStorage:
         # Registrar na auditoria
         self.audit_logger.log_cadastro(email, username, turma, grupo)
         
+        # Enviar email de confirmação de cadastro
+        try:
+            from src.utils.email_service import EmailService
+            email_service = EmailService()
+            success_email, message_email = email_service.enviar_confirmacao_cadastro(email, username, turma, grupo)
+            if not success_email:
+                print(f"Aviso: Email de confirmação não foi enviado: {message_email}")
+        except Exception as e:
+            print(f"Aviso: Erro ao enviar email de confirmação: {str(e)}")
+        
         return True, "Usuário criado com sucesso"
     
     def _update_pre_registered_user(self, email, password):
@@ -90,6 +100,21 @@ class UserStorage:
             self.users[email]["turma"], 
             "Grupo"  # Placeholder para grupo
         )
+        
+        # Enviar email de confirmação de ativação de conta
+        try:
+            from src.utils.email_service import EmailService
+            email_service = EmailService()
+            success_email, message_email = email_service.enviar_confirmacao_cadastro(
+                email, 
+                self.users[email]["name"], 
+                self.users[email]["turma"], 
+                "Grupo"
+            )
+            if not success_email:
+                print(f"Aviso: Email de confirmação não foi enviado: {message_email}")
+        except Exception as e:
+            print(f"Aviso: Erro ao enviar email de confirmação: {str(e)}")
         
         return True, "Usuário pré-cadastrado ativado com sucesso"
     
