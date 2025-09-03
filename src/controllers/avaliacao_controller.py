@@ -300,22 +300,7 @@ class AvaliacaoController:
         
         return validacoes
 
-    def preencher_dados_teste(self):
-        """Preenche o formulário com dados de teste."""
-        alunos_time = self.obter_alunos_para_avaliar()
-        nomes_eixos = self.obter_nomes_eixos()
-        num_alunos = len(alunos_time)
-        pontos_totais = num_alunos + 1
 
-        for i_eixo, eixo in enumerate(nomes_eixos):
-            # Distribui 1 ponto para cada aluno, e o restante para o último
-            pontos = [1] * num_alunos
-            pontos[-1] = pontos_totais - (num_alunos - 1)
-            for idx, aluno in enumerate(alunos_time):
-                self.inicializar_avaliacao_aluno(aluno)
-                st.session_state.avaliacoes_temp[aluno['id']]['notas'][i_eixo] = pontos[idx]
-                st.session_state.avaliacoes_temp[aluno['id']]['feedbacks'][i_eixo] = f"Feedback para {aluno['nome']} no {eixo}. Teste automatizado."
-        self.validar_avaliacoes()
     
     def salvar_avaliacoes(self) -> Tuple[bool, str]:
         """

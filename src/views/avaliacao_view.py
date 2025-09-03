@@ -189,34 +189,26 @@ class AvaliacaoView:
         """Renderiza o botão de salvar avaliações"""
         st.markdown("---")
 
-        col1, col2 = st.columns([1, 1])
-
-        with col1:
-            if st.button("Preencher para Teste"):
-                self.controller.preencher_dados_teste()
-                st.rerun()
-
-        with col2:
-            if st.button("💾 Salvar Avaliações", type="primary", use_container_width=True):
-                sucesso, mensagem = self.controller.salvar_avaliacoes()
-                if sucesso:
-                    st.session_state.avaliacao_salva = True
-                    st.session_state.mensagem_sucesso = mensagem
-                    # Buscar apenas as avaliações feitas pelo usuário no último envio (maior timestamp)
-                    from src.models.avaliacao import AvaliacaoModel
-                    model = AvaliacaoModel()
-                    df = model.carregar_dados()
-                    id_avaliador = st.session_state.get('aluno_id_atual')
-                    df_user = df[df['id_avaliador'] == id_avaliador]
-                    if not df_user.empty:
-                        ultimo_timestamp = df_user['timestamp'].max()
-                        avaliacoes_ultima = df_user[df_user['timestamp'] == ultimo_timestamp].to_dict(orient='records')
-                    else:
-                        avaliacoes_ultima = []
-                    st.session_state.avaliacoes_ultima = avaliacoes_ultima
-                    st.rerun()
+        if st.button("💾 Salvar Avaliações", type="primary", use_container_width=True):
+            sucesso, mensagem = self.controller.salvar_avaliacoes()
+            if sucesso:
+                st.session_state.avaliacao_salva = True
+                st.session_state.mensagem_sucesso = mensagem
+                # Buscar apenas as avaliações feitas pelo usuário no último envio (maior timestamp)
+                from src.models.avaliacao import AvaliacaoModel
+                model = AvaliacaoModel()
+                df = model.carregar_dados()
+                id_avaliador = st.session_state.get('aluno_id_atual')
+                df_user = df[df['id_avaliador'] == id_avaliador]
+                if not df_user.empty:
+                    ultimo_timestamp = df_user['timestamp'].max()
+                    avaliacoes_ultima = df_user[df_user['timestamp'] == ultimo_timestamp].to_dict(orient='records')
                 else:
-                    st.error(mensagem)
+                    avaliacoes_ultima = []
+                st.session_state.avaliacoes_ultima = avaliacoes_ultima
+                st.rerun()
+            else:
+                st.error(mensagem)
         
 
 
