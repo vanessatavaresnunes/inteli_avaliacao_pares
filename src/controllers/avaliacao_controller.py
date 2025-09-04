@@ -451,21 +451,32 @@ class AvaliacaoController:
             if not aluno_id_atual:
                 return False, "ID do usuário não encontrado. Faça login novamente."
             
-            # Carregar avaliações do usuário
+            # Carregar avaliações do usuário (sempre do Supabase)
+            print(f"🔄 Carregando dados do Supabase...")
             df = self.avaliacao_model.carregar_dados()
             print(f"🔍 DEBUG - DataFrame carregado:")
             print(f"  - Total de registros: {len(df)}")
             print(f"  - Colunas: {list(df.columns) if not df.empty else 'DataFrame vazio'}")
             
-            if not df.empty:
-                print(f"  - IDs de avaliadores únicos: {df['id_avaliador'].unique() if 'id_avaliador' in df.columns else 'Coluna id_avaliador não encontrada'}")
-                print(f"  - Procurando por ID: {aluno_id_atual}")
+            if df.empty:
+                return False, "Nenhum dado encontrado no Supabase. Tente novamente em alguns segundos."
+            
+            # Verificar se o ID existe nos dados
+            if 'id_avaliador' not in df.columns:
+                return False, "Erro: Coluna 'id_avaliador' não encontrada nos dados."
+            
+            ids_disponiveis = df['id_avaliador'].unique()
+            print(f"  - IDs de avaliadores únicos: {ids_disponiveis}")
+            print(f"  - Procurando por ID: {aluno_id_atual}")
+            
+            if aluno_id_atual not in ids_disponiveis:
+                return False, f"ID {aluno_id_atual} não encontrado nos dados disponíveis. IDs disponíveis: {sorted(ids_disponiveis)}"
             
             avaliacoes_usuario = df[df['id_avaliador'] == aluno_id_atual]
             print(f"🔍 DEBUG - Avaliações encontradas para o usuário: {len(avaliacoes_usuario)}")
             
             if avaliacoes_usuario.empty:
-                return False, "Nenhuma avaliação encontrada para enviar por email."
+                return False, f"Nenhuma avaliação encontrada para o ID {aluno_id_atual}. Verifique se as avaliações foram salvas corretamente."
             
             # Preparar dados para o email - transformar estrutura de dados
             avaliacoes_data = {
@@ -475,13 +486,18 @@ class AvaliacaoController:
             }
             
             # Agrupar avaliações por aluno avaliado
+            print(f"🔍 DEBUG - Agrupando avaliações por aluno avaliado...")
             avaliacoes_por_aluno = {}
+            eixos_processados = set()
+            
             for _, row in avaliacoes_usuario.iterrows():
                 id_avaliado = row.get('id_avaliado')
                 nome_avaliado = row.get('nome_avaliado', 'Aluno')
                 eixo = row.get('eixo', '')
                 nota = row.get('nota', 0)
                 feedback = row.get('feedback', 'N/A')
+                
+                print(f"  📝 Processando: {nome_avaliado} - {eixo} = {nota}")
                 
                 if id_avaliado not in avaliacoes_por_aluno:
                     avaliacoes_por_aluno[id_avaliado] = {
@@ -496,26 +512,47 @@ class AvaliacaoController:
                 
                 # Mapear eixo para o campo correto (case-insensitive)
                 eixo_lower = eixo.lower()
+                eixos_processados.add(eixo)
+                
                 if 'entregas' in eixo_lower and 'reais' in eixo_lower:
                     avaliacoes_por_aluno[id_avaliado]['nota_eixo1'] = nota
                     avaliacoes_por_aluno[id_avaliado]['feedback_eixo1'] = feedback
+                    print(f"    ✅ Mapeado para eixo 1")
                 elif 'valor' in eixo_lower and 'percebido' in eixo_lower:
                     avaliacoes_por_aluno[id_avaliado]['nota_eixo2'] = nota
                     avaliacoes_por_aluno[id_avaliado]['feedback_eixo2'] = feedback
+                    print(f"    ✅ Mapeado para eixo 2")
                 elif 'caixa' in eixo_lower and 'ferramentas' in eixo_lower:
                     avaliacoes_por_aluno[id_avaliado]['nota_eixo3'] = nota
                     avaliacoes_por_aluno[id_avaliado]['feedback_eixo3'] = feedback
+                    print(f"    ✅ Mapeado para eixo 3")
+                else:
+                    print(f"    ❌ Eixo não reconhecido: {eixo}")
+            
+            print(f"🔍 DEBUG - Eixos processados: {eixos_processados}")
+            print(f"🔍 DEBUG - Alunos agrupados: {len(avaliacoes_por_aluno)}")
             
             # Converter para lista
             avaliacoes_data['avaliacoes'] = list(avaliacoes_por_aluno.values())
             
+            # Verificação final antes do envio
+            if not avaliacoes_data['avaliacoes']:
+                return False, "Nenhuma avaliação válida encontrada para enviar por email."
+            
+            print(f"🔍 DEBUG - Dados preparados para email:")
+            print(f"  - Sprint: {avaliacoes_data['sprint']}")
+            print(f"  - Grupo: {avaliacoes_data['grupo']}")
+            print(f"  - Avaliações: {len(avaliacoes_data['avaliacoes'])}")
+            
             # Enviar email
+            print(f"📤 Enviando email para {email_usuario}...")
             from src.utils.email_service import EmailService
             email_service = EmailService()
             success, message = email_service.enviar_avaliacoes(
                 email_usuario, nome_usuario, avaliacoes_data
             )
             
+            print(f"📊 Resultado do envio: {success} - {message}")
             return success, message
             
         except Exception as e:
@@ -528,6 +565,15 @@ class AvaliacaoController:
         if 'email_pendente' in st.session_state:
             email_info = st.session_state['email_pendente']
             try:
+                # Aguardar consolidação dos dados
+                import time
+                print(f"⏳ Aguardando consolidação dos dados antes do envio de email...")
+                time.sleep(2)  # Aguardar 2 segundos para consolidação
+                
+                # Forçar recarregamento dos dados do Supabase
+                print(f"🔄 Forçando recarregamento dos dados do Supabase...")
+                self.avaliacao_model._cache_dados = None  # Limpar cache se existir
+                
                 sucesso, mensagem = self.enviar_avaliacoes_por_email(email_info['email'])
                 if sucesso:
                     st.success(f"📧 Email enviado com sucesso para {email_info['email']}")

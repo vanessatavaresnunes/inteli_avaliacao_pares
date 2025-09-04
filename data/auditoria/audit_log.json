@@ -514,5 +514,12 @@
     "email": "vanessa.nunes@prof.inteli.edu.br",
     "ip_address": "N/A",
     "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-09-04T16:21:34.823584",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
   }
 ]
