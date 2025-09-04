@@ -49,15 +49,15 @@ if df.empty:
     st.stop()
 
 # Carregar todas as turmas disponíveis (não apenas as com avaliações)
-def carregar_todas_turmas():
+def carregar_todas_turmas(df_avaliacoes):
     """Carrega todas as turmas disponíveis de diferentes fontes"""
     turmas_avaliacao = []
     turmas_alunos = []
     turmas_usuarios = []
     
     # 1. Turmas com dados de avaliação
-    if not df.empty and 'turma' in df.columns:
-        turmas_avaliacao = sorted(df['turma'].unique())
+    if not df_avaliacoes.empty and 'turma' in df_avaliacoes.columns:
+        turmas_avaliacao = sorted(df_avaliacoes['turma'].unique())
     
     # 2. Turmas do arquivo de alunos (definição oficial)
     try:
@@ -85,7 +85,7 @@ def carregar_todas_turmas():
     return todas_turmas
 
 # Carregar todas as turmas disponíveis
-todas_turmas = carregar_todas_turmas()
+todas_turmas = carregar_todas_turmas(df)
 
 if not todas_turmas:
     st.error("Nenhuma turma encontrada nos arquivos de configuração.")
