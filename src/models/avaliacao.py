@@ -241,6 +241,8 @@ class AvaliacaoModel:
     def validar_feedbacks_unicos(self, avaliacoes: Dict, ids_alunos_time: List[int], nomes_eixos: List[str]) -> bool:
         """
         Valida se os feedbacks para um mesmo aluno são únicos.
+        NOTA: Esta validação foi desabilitada pois é aceitável que um aluno tenha
+        o mesmo feedback para todos os eixos.
 
         Args:
             avaliacoes: Dicionário com as avaliações.
@@ -248,12 +250,9 @@ class AvaliacaoModel:
             nomes_eixos: Lista com os nomes dos eixos.
 
         Returns:
-            True se os feedbacks são únicos, False caso contrário.
+            True sempre (validação desabilitada).
         """
-        for id_aluno in ids_alunos_time:
-            feedbacks_aluno = [unicodedata.normalize('NFC', avaliacoes[id_aluno]['feedbacks'][i]).strip() for i in range(len(nomes_eixos))]
-            if len(feedbacks_aluno) != len(set(feedbacks_aluno)):
-                return False
+        # Validação desabilitada - é aceitável ter feedbacks iguais para todos os eixos
         return True
 
     def validar_conteudo_feedbacks(self, avaliacoes: Dict, ids_alunos_time: List[int], nomes_eixos: List[str]) -> bool:

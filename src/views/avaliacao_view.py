@@ -189,7 +189,22 @@ class AvaliacaoView:
         """Renderiza o botão de salvar avaliações"""
         st.markdown("---")
 
-        if st.button("💾 Salvar Avaliações", type="primary", use_container_width=True):
+        # Verificar se todas as validações passaram
+        validacoes = self.controller.validar_avaliacoes()
+        todas_validas = (
+            all(validacoes['soma_notas'].values()) and
+            validacoes['notas_individuais'] and
+            validacoes['feedbacks_preenchidos'] and
+            validacoes['feedbacks_unicos'] and
+            validacoes['conteudo_feedbacks']
+        )
+
+        # Mostrar mensagem se validação falhar
+        if not todas_validas:
+            st.warning("⚠️ Corrija os erros de validação acima antes de salvar as avaliações.")
+        
+        # Desabilitar botão se validação falhar
+        if st.button("💾 Salvar Avaliações", type="primary", use_container_width=True, disabled=not todas_validas):
             sucesso, mensagem = self.controller.salvar_avaliacoes()
             if sucesso:
                 st.session_state.avaliacao_salva = True
