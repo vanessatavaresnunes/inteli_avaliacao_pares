@@ -69,6 +69,43 @@ class TestAvaliacaoModel(unittest.TestCase):
         # Deve retornar True ou False
         self.assertIsInstance(resultado, bool)
     
+    def test_calcular_nota_maxima_regra_hibrida(self):
+        """Testa cálculo de nota máxima com a regra híbrida"""
+        from src.models.usuario import UsuarioModel
+        usuario_model = UsuarioModel()
+        
+        # Testar diferentes tamanhos de grupo com regra híbrida
+        casos_teste = [
+            (2, 2, "N/2+1"),  # Grupo de 2: N/2+1 = 1+1 = 2
+            (3, 2, "N/2+1"),  # Grupo de 3: N/2+1 = 1+1 = 2
+            (4, 2, "N/2"),    # Grupo de 4: N/2 = 2
+            (5, 2, "N/2"),    # Grupo de 5: N/2 = 2
+            (6, 3, "N/2"),    # Grupo de 6: N/2 = 3
+            (7, 3, "N/2"),    # Grupo de 7: N/2 = 3
+            (8, 4, "N/2"),    # Grupo de 8: N/2 = 4
+        ]
+        
+        for num_integrantes, nota_maxima_esperada, regra_usada in casos_teste:
+            with self.subTest(num_integrantes=num_integrantes):
+                nota_maxima = usuario_model.calcular_nota_maxima(num_integrantes)
+                self.assertEqual(nota_maxima, nota_maxima_esperada, 
+                               f"Grupo de {num_integrantes} deveria ter nota máxima {nota_maxima_esperada} (usando {regra_usada}), mas obteve {nota_maxima}")
+    
+    def test_regra_distribuicao_pontos(self):
+        """Testa se a regra permite distribuir todos os pontos por eixo"""
+        from src.models.usuario import UsuarioModel
+        usuario_model = UsuarioModel()
+        
+        # Testar se a regra permite distribuir N pontos (número de integrantes) por eixo
+        for num_integrantes in range(2, 9):
+            nota_maxima = usuario_model.calcular_nota_maxima(num_integrantes)
+            pontos_totais_por_eixo = num_integrantes
+            max_distribuivel = nota_maxima * (num_integrantes - 1)  # N-1 alunos podem receber nota
+            
+            with self.subTest(num_integrantes=num_integrantes):
+                self.assertGreaterEqual(max_distribuivel, pontos_totais_por_eixo,
+                                      f"Grupo de {num_integrantes}: máximo distribuível ({max_distribuivel}) deve ser >= pontos totais ({pontos_totais_por_eixo})")
+    
     def test_obter_estatisticas_dados_vazios(self):
         """Testa obtenção de estatísticas com dados vazios"""
         df = pd.DataFrame()

@@ -1,5 +1,5 @@
 {
     "nota_minima": 0,
-    "regra_nota_maxima": "N-1",
-    "descricao_regra": "A nota máxima é calculada dinamicamente como N-1, onde N é o número de integrantes do grupo, permitindo distribuição equilibrada dos pontos"
+    "regra_nota_maxima": "hibrida",
+    "descricao_regra": "Regra híbrida: grupos de 2-3 integrantes usam parte_inteira(N/2)+1, grupos de 4+ integrantes usam parte_inteira(N/2), garantindo distribuição otimizada dos pontos"
 }

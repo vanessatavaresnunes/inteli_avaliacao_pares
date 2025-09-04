@@ -127,6 +127,10 @@ class UsuarioModel:
         """
         Calcula a nota máxima dinamicamente baseada no número de integrantes do grupo.
         
+        Regra híbrida:
+        - Grupos de 2-3 integrantes: usa N/2+1 (parte inteira de N/2 + 1)
+        - Grupos de 4+ integrantes: usa N/2 (parte inteira de N/2)
+        
         Args:
             num_integrantes_grupo: Número de integrantes no grupo
             
@@ -134,10 +138,21 @@ class UsuarioModel:
             Nota máxima permitida para o grupo
         """
         config = self._carregar_configuracao()
-        regra = config.get('regra_nota_maxima', 'N/2')
+        regra = config.get('regra_nota_maxima', 'hibrida')
         
         if regra == 'N/2':
             return max(1, num_integrantes_grupo // 2)
+        elif regra == 'N/2+1':
+            # Regra N/2+1: parte inteira de N/2 + 1
+            return max(1, (num_integrantes_grupo // 2) + 1)
+        elif regra == 'hibrida':
+            # Regra híbrida: N/2+1 para grupos pequenos, N/2 para grupos grandes
+            if num_integrantes_grupo <= 3:
+                # Grupos de 2-3: N/2+1
+                return max(1, (num_integrantes_grupo // 2) + 1)
+            else:
+                # Grupos de 4+: N/2
+                return max(1, num_integrantes_grupo // 2)
         elif regra == 'N':
             return num_integrantes_grupo
         elif regra == 'N-1':
@@ -159,8 +174,11 @@ class UsuarioModel:
                     # Se não tem N, tenta converter para int
                     return max(1, int(regra))
             except (ValueError, SyntaxError):
-                # Fallback para valor padrão
-                return max(1, num_integrantes_grupo // 2)
+                # Fallback para regra híbrida
+                if num_integrantes_grupo <= 3:
+                    return max(1, (num_integrantes_grupo // 2) + 1)
+                else:
+                    return max(1, num_integrantes_grupo // 2)
     
     def obter_configuracao_notas(self, num_integrantes_grupo: int = None) -> Dict:
         """

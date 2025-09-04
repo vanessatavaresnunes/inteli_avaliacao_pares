@@ -99,38 +99,66 @@ class AvaliacaoModel:
             arquivo_temp = tmp_file.name
         try:
             # Upload para Supabase
+            print(f"📤 Salvando avaliação individual: {nome_arquivo}")
             upload_json_to_bucket(arquivo_temp, nome_arquivo)
+            print(f"✅ Avaliação individual salva com sucesso")
+            
             # Salvar arquivo consolidado no Supabase
+            print(f"📤 Atualizando arquivo consolidado...")
             self._salvar_arquivo_consolidado(df)
+            print(f"✅ Arquivo consolidado atualizado com sucesso")
+        except Exception as e:
+            print(f"❌ Erro ao salvar avaliação: {e}")
+            raise e
         finally:
             # Limpar arquivo temporário
-            os.unlink(arquivo_temp)
+            try:
+                os.unlink(arquivo_temp)
+            except:
+                pass
         return nome_arquivo
     
     def _salvar_arquivo_consolidado(self, df_novo: pd.DataFrame):
         """Salva ou atualiza o arquivo consolidado local e no Supabase"""
-        # Tentar baixar arquivo consolidado existente do Supabase
+        arquivo_temp_download = None
+        arquivo_temp_upload = None
+        
         try:
+            # Tentar baixar arquivo consolidado existente do Supabase
+            print(f"📥 Tentando baixar arquivo consolidado existente...")
             with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as tmp_file:
                 arquivo_temp_download = tmp_file.name
             
             download_json_from_bucket('avaliacoescompletas_consolidadas.json', arquivo_temp_download)
             df_existente = pd.read_json(arquivo_temp_download, orient='records', lines=True, encoding='utf-8')
             df_consolidado = pd.concat([df_existente, df_novo], ignore_index=True)
-            os.unlink(arquivo_temp_download)
-        except:
+            print(f"✅ Arquivo consolidado existente carregado: {len(df_existente)} registros + {len(df_novo)} novos = {len(df_consolidado)} total")
+        except Exception as e:
             # Se não existir arquivo consolidado, usar apenas os novos dados
+            print(f"ℹ️ Arquivo consolidado não existe ou erro ao baixar: {e}")
+            print(f"📝 Criando novo arquivo consolidado com {len(df_novo)} registros")
             df_consolidado = df_novo
         
         # Criar arquivo temporário para upload
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as tmp_file:
-            df_consolidado.to_json(tmp_file.name, orient='records', lines=True, force_ascii=False)
-            arquivo_temp_upload = tmp_file.name
-        
         try:
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as tmp_file:
+                df_consolidado.to_json(tmp_file.name, orient='records', lines=True, force_ascii=False)
+                arquivo_temp_upload = tmp_file.name
+            
+            print(f"📤 Fazendo upload do arquivo consolidado...")
             upload_json_to_bucket(arquivo_temp_upload, 'avaliacoescompletas_consolidadas.json')
+            print(f"✅ Arquivo consolidado salvo com sucesso")
+        except Exception as e:
+            print(f"❌ Erro ao salvar arquivo consolidado: {e}")
+            raise e
         finally:
-            os.unlink(arquivo_temp_upload)
+            # Limpar arquivos temporários
+            for temp_file in [arquivo_temp_download, arquivo_temp_upload]:
+                if temp_file:
+                    try:
+                        os.unlink(temp_file)
+                    except:
+                        pass
     
     def carregar_dados(self) -> pd.DataFrame:
         """
