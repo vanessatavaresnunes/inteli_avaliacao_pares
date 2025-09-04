@@ -1,17 +1,31 @@
-# Configuração de Email com Variáveis de Ambiente
+# Configuração de Variáveis de Ambiente
 
-## Arquivo de Configuração
+## Arquivos de Configuração
 
-O sistema agora usa variáveis de ambiente para configuração de email. O arquivo principal é `config/email.env`.
+O sistema usa variáveis de ambiente para configuração do Supabase e email. Os arquivos principais são:
+- `.env` (raiz do projeto) - Configurações do Supabase
+- `config/email.env` - Configurações de email
 
 ## Como Configurar
 
-1. **Copie o arquivo de exemplo:**
+1. **Configure o Supabase (arquivo `.env` na raiz):**
+   ```bash
+   cp config/env.example .env
+   ```
+   
+   Edite o arquivo `.env` com suas credenciais do Supabase:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=sua-url-do-supabase
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sua-chave-publishable
+   BUCKET_NAME=inteli_avaliacao_pares_sprint
+   ```
+
+2. **Configure o Email (arquivo `config/email.env`):**
    ```bash
    cp config/env.example config/email.env
    ```
-
-2. **Edite o arquivo `config/email.env` com suas credenciais:**
+   
+   Edite o arquivo `config/email.env` com suas credenciais de email:
    ```env
    SMTP_SERVER=smtp.gmail.com
    SMTP_PORT=587
@@ -23,6 +37,12 @@ O sistema agora usa variáveis de ambiente para configuração de email. O arqui
 
 ## Variáveis Disponíveis
 
+### Supabase (arquivo `.env`)
+- `NEXT_PUBLIC_SUPABASE_URL`: URL do projeto Supabase
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`: Chave publishable do Supabase
+- `BUCKET_NAME`: Nome do bucket de armazenamento (padrão: inteli_avaliacao_pares_sprint)
+
+### Email (arquivo `config/email.env`)
 - `SMTP_SERVER`: Servidor SMTP (padrão: smtp.gmail.com)
 - `SMTP_PORT`: Porta SMTP (padrão: 587)
 - `SENDER_EMAIL`: Email remetente
@@ -32,10 +52,11 @@ O sistema agora usa variáveis de ambiente para configuração de email. O arqui
 
 ## Segurança
 
-- ⚠️ **IMPORTANTE**: O arquivo `email.env` contém informações sensíveis e NÃO deve ser commitado no Git
-- O arquivo `config/email.env` já está no `.gitignore` para proteger suas credenciais
+- ⚠️ **IMPORTANTE**: Os arquivos `.env` e `config/email.env` contêm informações sensíveis e NÃO devem ser commitados no Git
+- Os arquivos `.env` e `config/email.env` já estão no `.gitignore` para proteger suas credenciais
 - Use senhas de aplicativo para Gmail (não use sua senha normal)
-- Nunca compartilhe suas credenciais de email
+- Nunca compartilhe suas credenciais de Supabase ou email
+- A chave `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` é segura para uso público (publishable)
 
 ### Como Configurar Gmail com Senha de App:
 

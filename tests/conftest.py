@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 
 # Mock das variáveis de ambiente do Supabase para testes
 os.environ.setdefault('NEXT_PUBLIC_SUPABASE_URL', 'https://mock-supabase.com')
-os.environ.setdefault('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'mock-key')
+os.environ.setdefault('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY', 'mock-key')
 os.environ.setdefault('BUCKET_NAME', 'mock-bucket')
 
 # Mock global do cliente Supabase

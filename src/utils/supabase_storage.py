@@ -4,7 +4,7 @@ from supabase import create_client, Client
 
 load_dotenv()
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
-SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY")
 BUCKET_NAME = os.getenv("BUCKET_NAME", "inteli_avaliacao_pares_sprint")
 
 def get_supabase_client():
