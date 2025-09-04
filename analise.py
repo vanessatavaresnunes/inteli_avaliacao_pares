@@ -56,8 +56,11 @@ def carregar_todas_turmas(df_avaliacoes):
     turmas_usuarios = []
     
     # 1. Turmas com dados de avaliação
-    if not df_avaliacoes.empty and 'turma' in df_avaliacoes.columns:
-        turmas_avaliacao = sorted(df_avaliacoes['turma'].unique())
+    if df_avaliacoes is not None and not df_avaliacoes.empty and 'turma' in df_avaliacoes.columns:
+        # Filtrar valores nulos e vazios da coluna turma
+        turmas_validas = df_avaliacoes['turma'].dropna()
+        turmas_validas = turmas_validas[turmas_validas != '']
+        turmas_avaliacao = sorted(turmas_validas.unique())
     
     # 2. Turmas do arquivo de alunos (definição oficial)
     try:
