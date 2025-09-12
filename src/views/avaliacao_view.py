@@ -40,8 +40,28 @@ class AvaliacaoView:
         
         st.markdown("---")
         
-        # Seleção de sprint (Sprint 1 desabilitada - já acabou)
-        st.selectbox("Selecione a Sprint", [f"Sprint {i}" for i in range(2, 6)], key="sprint_atual")
+        # Seleção de sprint (sprint ativa selecionada automaticamente)
+        sprints_disponiveis = self.controller.obter_sprints_disponiveis()
+        sprint_ativa = self.controller.obter_sprint_ativa()
+        
+        # Se a sprint ativa não estiver na lista, adicionar
+        if sprint_ativa not in sprints_disponiveis:
+            sprints_disponiveis.append(sprint_ativa)
+            sprints_disponiveis.sort()
+        
+        # Definir sprint ativa na session_state se não estiver definida
+        if 'sprint_atual' not in st.session_state:
+            st.session_state.sprint_atual = sprint_ativa
+        elif st.session_state.sprint_atual not in sprints_disponiveis:
+            # Se a sprint atual não estiver na lista, usar a sprint ativa
+            st.session_state.sprint_atual = sprint_ativa
+        
+        st.selectbox(
+            "Selecione a Sprint", 
+            sprints_disponiveis, 
+            key="sprint_atual",
+            help=f"📅 Sprint ativa automaticamente selecionada: {sprint_ativa}"
+        )
 
         # Obter dados do usuário atual
         alunos_time = self.controller.obter_alunos_para_avaliar()
@@ -171,12 +191,13 @@ class AvaliacaoView:
             for msg in st.session_state.validation_messages['feedbacks_preenchidos']['messages']:
                 st.error(msg)
 
-        st.markdown("**Feedbacks Únicos:**")
-        if st.session_state.validation_messages['feedbacks_unicos']['is_valid']:
-            st.success("Os feedbacks para um mesmo aluno são únicos.")
-        else:
-            for msg in st.session_state.validation_messages['feedbacks_unicos']['messages']:
-                st.error(msg)
+        # Validação de feedbacks únicos foi desabilitada - não mostrar mensagem
+        # st.markdown("**Feedbacks Únicos:**")
+        # if st.session_state.validation_messages['feedbacks_unicos']['is_valid']:
+        #     st.success("Os feedbacks para um mesmo aluno são únicos.")
+        # else:
+        #     for msg in st.session_state.validation_messages['feedbacks_unicos']['messages']:
+        #         st.error(msg)
 
         st.markdown("**Conteúdo dos Feedbacks:**")
         if st.session_state.validation_messages['conteudo_feedbacks']['is_valid']:

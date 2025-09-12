@@ -5,6 +5,8 @@ Responsável por coordenar entre modelos e views.
 
 from typing import Dict, List, Optional, Tuple
 import streamlit as st
+import json
+from datetime import datetime, timedelta
 from src.models.avaliacao import AvaliacaoModel
 from src.models.usuario import UsuarioModel
 from src.utils.matricula_validator import MatriculaValidator
@@ -612,6 +614,102 @@ class AvaliacaoController:
     def obter_alunos_por_time(self, time: str, turma: str = None) -> List[str]:
         """Obtém lista de alunos de um time para a turma informada ou atual"""
         return self.usuario_model.obter_alunos_por_time(time, turma)
+    
+    def carregar_dados_sprints(self) -> Dict:
+        """
+        Carrega os dados das sprints do arquivo sprint_dates_2025_2a.json
+        
+        Returns:
+            Dicionário com os dados das sprints
+        """
+        try:
+            with open('data/sprint_dates_2025_2a.json', 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Erro ao carregar dados das sprints: {e}")
+            return {}
+    
+    def obter_sprint_ativa(self) -> str:
+        """
+        Determina qual sprint está ativa baseada na data atual
+        
+        Returns:
+            Nome da sprint ativa (ex: "Sprint 1", "Sprint 2", etc.)
+        """
+        dados_sprints = self.carregar_dados_sprints()
+        if not dados_sprints or 'sprints' not in dados_sprints:
+            return "Sprint 2"  # Fallback padrão
+        
+        data_atual = datetime.now().date()
+        sprints = dados_sprints['sprints']
+        
+        # Ordenar sprints por data de início
+        sprints_ordenadas = []
+        for key, sprint in sprints.items():
+            try:
+                data_inicio = datetime.strptime(sprint['data_inicio'], '%Y-%m-%d').date()
+                data_fim = datetime.strptime(sprint['data_fim'], '%Y-%m-%d').date()
+                sprints_ordenadas.append({
+                    'key': key,
+                    'nome': sprint['nome'],
+                    'data_inicio': data_inicio,
+                    'data_fim': data_fim
+                })
+            except ValueError as e:
+                st.warning(f"Erro ao processar datas da {sprint['nome']}: {e}")
+                continue
+        
+        # Ordenar por data de início
+        sprints_ordenadas.sort(key=lambda x: x['data_inicio'])
+        
+        # Encontrar a sprint ativa
+        for i, sprint in enumerate(sprints_ordenadas):
+            # Se estamos dentro do período da sprint
+            if sprint['data_inicio'] <= data_atual <= sprint['data_fim']:
+                return sprint['nome']
+            
+            # Se a sprint terminou e a próxima começa em até 2 dias
+            if data_atual > sprint['data_fim']:
+                if i + 1 < len(sprints_ordenadas):
+                    proxima_sprint = sprints_ordenadas[i + 1]
+                    dias_ate_proxima = (proxima_sprint['data_inicio'] - data_atual).days
+                    if 0 <= dias_ate_proxima <= 2:
+                        return proxima_sprint['nome']
+        
+        # Se não encontrou nenhuma sprint ativa, retornar a primeira disponível
+        if sprints_ordenadas:
+            return sprints_ordenadas[0]['nome']
+        
+        return "Sprint 2"  # Fallback padrão
+    
+    def obter_sprints_disponiveis(self) -> List[str]:
+        """
+        Obtém lista de sprints disponíveis ordenadas
+        
+        Returns:
+            Lista com nomes das sprints
+        """
+        dados_sprints = self.carregar_dados_sprints()
+        if not dados_sprints or 'sprints' not in dados_sprints:
+            return [f"Sprint {i}" for i in range(2, 6)]  # Fallback padrão
+        
+        sprints = dados_sprints['sprints']
+        sprints_ordenadas = []
+        
+        for key, sprint in sprints.items():
+            try:
+                data_inicio = datetime.strptime(sprint['data_inicio'], '%Y-%m-%d').date()
+                sprints_ordenadas.append({
+                    'nome': sprint['nome'],
+                    'data_inicio': data_inicio
+                })
+            except ValueError:
+                continue
+        
+        # Ordenar por data de início
+        sprints_ordenadas.sort(key=lambda x: x['data_inicio'])
+        
+        return [sprint['nome'] for sprint in sprints_ordenadas]
 
     def configurar_turma_grupo(self, turma: str, grupo: str):
         """
@@ -664,6 +762,6 @@ class AvaliacaoController:
         if 'avaliacoes_temp' not in st.session_state:
             st.session_state.avaliacoes_temp = {}
         
-        # Configurar sprint padrão (Sprint 1 desabilitada - já acabou)
+        # Configurar sprint ativa automaticamente baseada na data atual
         if 'sprint_atual' not in st.session_state:
-            st.session_state.sprint_atual = "Sprint 2"
+            st.session_state.sprint_atual = self.obter_sprint_ativa()
