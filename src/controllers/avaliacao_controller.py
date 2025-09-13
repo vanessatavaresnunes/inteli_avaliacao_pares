@@ -666,7 +666,11 @@ class AvaliacaoController:
         for i, sprint in enumerate(sprints_ordenadas):
             # Se estamos dentro do período da sprint
             if sprint['data_inicio'] <= data_atual <= sprint['data_fim']:
-                return sprint['nome']
+                # Retornar a sprint anterior (se existir)
+                if i > 0:
+                    return sprints_ordenadas[i - 1]['nome']
+                else:
+                    return sprint['nome']  # Se for a primeira sprint, retornar ela mesma
             
             # Se a sprint terminou e a próxima começa em até 2 dias
             if data_atual > sprint['data_fim']:
@@ -674,7 +678,8 @@ class AvaliacaoController:
                     proxima_sprint = sprints_ordenadas[i + 1]
                     dias_ate_proxima = (proxima_sprint['data_inicio'] - data_atual).days
                     if 0 <= dias_ate_proxima <= 2:
-                        return proxima_sprint['nome']
+                        # Retornar a sprint anterior à próxima (que seria a atual)
+                        return sprint['nome']
         
         # Se não encontrou nenhuma sprint ativa, retornar a primeira disponível
         if sprints_ordenadas:

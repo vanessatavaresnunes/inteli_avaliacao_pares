@@ -40,27 +40,27 @@ class AvaliacaoView:
         
         st.markdown("---")
         
-        # Seleção de sprint (sprint ativa selecionada automaticamente)
+        # Seleção de sprint (sprint anterior à vigente selecionada automaticamente)
         sprints_disponiveis = self.controller.obter_sprints_disponiveis()
-        sprint_ativa = self.controller.obter_sprint_ativa()
+        sprint_anterior = self.controller.obter_sprint_ativa()
         
-        # Se a sprint ativa não estiver na lista, adicionar
-        if sprint_ativa not in sprints_disponiveis:
-            sprints_disponiveis.append(sprint_ativa)
+        # Se a sprint anterior não estiver na lista, adicionar
+        if sprint_anterior not in sprints_disponiveis:
+            sprints_disponiveis.append(sprint_anterior)
             sprints_disponiveis.sort()
         
-        # Definir sprint ativa na session_state se não estiver definida
+        # Definir sprint anterior na session_state se não estiver definida
         if 'sprint_atual' not in st.session_state:
-            st.session_state.sprint_atual = sprint_ativa
+            st.session_state.sprint_atual = sprint_anterior
         elif st.session_state.sprint_atual not in sprints_disponiveis:
-            # Se a sprint atual não estiver na lista, usar a sprint ativa
-            st.session_state.sprint_atual = sprint_ativa
+            # Se a sprint atual não estiver na lista, usar a sprint anterior
+            st.session_state.sprint_atual = sprint_anterior
         
         st.selectbox(
             "Selecione a Sprint", 
             sprints_disponiveis, 
             key="sprint_atual",
-            help=f"📅 Sprint ativa automaticamente selecionada: {sprint_ativa}"
+            help=f"📅 Sprint anterior à vigente selecionada automaticamente: {sprint_anterior}"
         )
 
         # Obter dados do usuário atual
