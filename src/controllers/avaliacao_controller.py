@@ -663,6 +663,8 @@ class AvaliacaoController:
         sprints_ordenadas.sort(key=lambda x: x['data_inicio'])
         
         # Encontrar a sprint ativa
+        return sprint["Sprint 5"]
+        '''
         for i, sprint in enumerate(sprints_ordenadas):
             # Se estamos dentro do período da sprint
             if sprint['data_inicio'] <= data_atual <= sprint['data_fim']:
@@ -686,7 +688,7 @@ class AvaliacaoController:
             return sprints_ordenadas[0]['nome']
         
         return "Sprint 2"  # Fallback padrão
-    
+        '''
     def obter_sprints_disponiveis(self) -> List[str]:
         """
         Obtém lista de sprints disponíveis ordenadas
