@@ -98,7 +98,31 @@ if not todas_turmas:
 turma_selecionada = st.selectbox("Selecione a turma para análise:", todas_turmas, key="analise_turma")
 
 # Filtrar dados da turma selecionada (se houver dados de avaliação)
-df_turma = df[df['turma'] == turma_selecionada] if not df.empty and 'turma' in df.columns else pd.DataFrame()
+df_turma = df[df['turma'] == turma_selecionada].copy() if not df.empty and 'turma' in df.columns else pd.DataFrame()
+
+# Lógica para corrigir a Sprint das avaliações com base na data de início da Avaliação de Pares
+if not df_turma.empty:
+    try:
+        with open('data/sprint_dates_2025_2a.json', 'r', encoding='utf-8') as f:
+            sprint_dates_data = json.load(f)
+            sprints_info = sprint_dates_data.get("sprints", {})
+            
+            sprint_5_info = sprints_info.get("sprint_5", {})
+            if "data_avalpares_inicio" in sprint_5_info:
+                data_inicio_s5 = pd.to_datetime(sprint_5_info["data_avalpares_inicio"])
+                
+                # Criar uma nova coluna de data, tratando o timestamp como segundos (Unix time)
+                # Uma nova coluna é usada para manter o timestamp original para ordenação
+                df_turma['timestamp_dt'] = pd.to_datetime(df_turma['timestamp'], unit='s', errors='coerce')
+
+                # Identifica as avaliações que deveriam ser da Sprint 5
+                filtro_data = df_turma['timestamp_dt'] >= data_inicio_s5
+                
+                # Aplica a correção
+                df_turma.loc[filtro_data, 'sprint'] = 'Sprint 5'
+
+    except Exception as e:
+        st.warning(f"Não foi possível aplicar a regra de data para a Sprint 5: {e}")
 
 # Verificar se há dados de avaliação para esta turma
 tem_avaliacoes = not df_turma.empty
@@ -213,6 +237,15 @@ if not tem_avaliacoes:
     st.info(f"ℹ️ **Turma {turma_selecionada}**: Nenhuma avaliação foi realizada ainda. Os grupos e alunos são mostrados com base na configuração oficial.")
     st.markdown("---")
 
+# Carregar datas das sprints para filtro especial da Sprint 5
+sprint_dates = {}
+try:
+    with open('data/sprint_dates_2025_2a.json', 'r', encoding='utf-8') as f:
+        sprint_dates_data = json.load(f)
+        sprint_dates = sprint_dates_data.get("sprints", {})
+except Exception as e:
+    print(f"Erro ao carregar datas das sprints: {e}")
+
 for grupo in grupos:
     with st.expander(f"🏢 Grupo: {grupo}", expanded=False):
         df_grupo = df_turma[df_turma["time"] == grupo] if not df_turma.empty else pd.DataFrame()
@@ -288,6 +321,7 @@ for grupo in grupos:
         
         for sprint in sprints:
             df_sprint = df_grupo[df_grupo["sprint"] == sprint]
+
             if df_sprint.empty:
                 continue
                 

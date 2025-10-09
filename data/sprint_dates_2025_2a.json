@@ -39,7 +39,8 @@
       "data_fim": "2025-10-09",
       "dias_uteis": 5,
       "horas_por_dia": 2,
-      "total_horas": 10
+      "total_horas": 10,
+      "data_avalpares_inicio": "2025-10-06"
 
     }
   }
