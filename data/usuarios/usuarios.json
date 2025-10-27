@@ -403,7 +403,7 @@
   },
   "vanessa.nunes@prof.inteli.edu.br": {
     "name": "Vanessa Tavares Nunes",
-    "passwd": "$2b$12$UDJyk6sxL.M85G7EIsO5tOaLS8frEeDxAWfuuLLb3x3S2/k/Nd6pu",
+    "passwd": "$2b$12$i8DkHO15OPOBDD67K/9dweTnlGFsrJMCx8vm/BKjNJm8fLA6ECPGK",
     "turma": "Teste",
     "id": 68
   },
@@ -424,5 +424,161 @@
     "passwd": "",
     "turma": "Teste",
     "id": 71
+  },
+  "felipe.simao@sou.inteli.edu.br": {
+    "name": "Felipe Freire Machado Simão",
+    "passwd": "",
+    "turma": "T13",
+    "id": 72
+  },
+  "Augustin.Vains@sou.inteli.edu.br": {
+    "name": "Augustin Max Marie Raphaël Hubert Regnouf de Vains",
+    "passwd": "",
+    "turma": "T14",
+    "id": 73
+  },
+  "Bernardo.meirelles@sou.inteli.edu.br": {
+    "name": "Bernardo de Figueiredo Meirelles",
+    "passwd": "",
+    "turma": "T14",
+    "id": 74
+  },
+  "David.Nascimento@sou.inteli.edu.br": {
+    "name": "David Deodato Alvarenga Nascimento",
+    "passwd": "",
+    "turma": "T14",
+    "id": 75
+  },
+  "Enzo.Barci@sou.inteli.edu.br": {
+    "name": "Enzo Salvador Barci",
+    "passwd": "",
+    "turma": "T14",
+    "id": 76
+  },
+  "Matheus.Sousa@sou.inteli.edu.br": {
+    "name": "Matheus Fernandes Guimarães de Sousa",
+    "passwd": "",
+    "turma": "T14",
+    "id": 77
+  },
+  "Aymeric.Orliac@sou.inteli.edu.br": {
+    "name": "Aymeric Jacques Ulysse Marie Orliac",
+    "passwd": "",
+    "turma": "T14",
+    "id": 78
+  },
+  "Cibele.Leal@sou.inteli.edu.br": {
+    "name": "Cibele Figueredo Leal",
+    "passwd": "",
+    "turma": "T14",
+    "id": 79
+  },
+  "Fernanda.Nascimento@sou.inteli.edu.br": {
+    "name": "Fernanda Correia Nascimento",
+    "passwd": "",
+    "turma": "T14",
+    "id": 80
+  },
+  "Gabriela.Silva2@sou.inteli.edu.br": {
+    "name": "Gabriela Silva",
+    "passwd": "",
+    "turma": "T14",
+    "id": 81
+  },
+  "Mariana.Souza@sou.inteli.edu.br": {
+    "name": "Mariana de Paula Barbosa Souza",
+    "passwd": "",
+    "turma": "T14",
+    "id": 82
+  },
+  "Igor.Silva@sou.inteli.edu.br": {
+    "name": "Igor Sampaio Silva",
+    "passwd": "",
+    "turma": "T14",
+    "id": 83
+  },
+  "Isadora.Gatto@sou.inteli.edu.br": {
+    "name": "Isadora Tribst Gatto",
+    "passwd": "",
+    "turma": "T14",
+    "id": 84
+  },
+  "Kaio.Silva@sou.inteli.edu.br": {
+    "name": "Kaio Vittor Martins Silva",
+    "passwd": "",
+    "turma": "T14",
+    "id": 85
+  },
+  "Leo.Hinners@sou.inteli.edu.br": {
+    "name": "Leo Heinrich Hinners",
+    "passwd": "",
+    "turma": "T14",
+    "id": 86
+  },
+  "Marcelo.Rossignolli@sou.inteli.edu.br": {
+    "name": "Marcelo Rubim Rossignolli",
+    "passwd": "",
+    "turma": "T14",
+    "id": 87
+  },
+  "Isabelly.Montalvao@sou.inteli.edu.br": {
+    "name": "Isabelly Maia Montalvão",
+    "passwd": "",
+    "turma": "T14",
+    "id": 88
+  },
+  "Leonardo.Griner@sou.inteli.edu.br": {
+    "name": "Leonardo Nigri Griner",
+    "passwd": "",
+    "turma": "T14",
+    "id": 89
+  },
+  "Leonardo.Martins@sou.inteli.edu.br": {
+    "name": "Leonardo Souza Martins",
+    "passwd": "",
+    "turma": "T14",
+    "id": 90
+  },
+  "Mirella.Lima@sou.inteli.edu.br": {
+    "name": "Mirella Borim Lima",
+    "passwd": "",
+    "turma": "T14",
+    "id": 91
+  },
+  "Noemie.Le@sou.inteli.edu.br": {
+    "name": "Noémie My-Xuân Louise Le",
+    "passwd": "",
+    "turma": "T14",
+    "id": 92
+  },
+  "Moyses.Anijar@sou.inteli.edu.br": {
+    "name": "Moyses Birman Anijar",
+    "passwd": "",
+    "turma": "T14",
+    "id": 93
+  },
+  "Pedro.Faria@sou.inteli.edu.br": {
+    "name": "Pedro El Haouli Faria",
+    "passwd": "",
+    "turma": "T14",
+    "id": 94
+  },
+  "Ricardo.Planas@sou.inteli.edu.br": {
+    "name": "Ricardo de Toledo Planas",
+    "passwd": "",
+    "turma": "T14",
+    "id": 95
+  },
+  "Sacha.Kefif@sou.inteli.edu.br": {
+    "name": "Sacha Kefif",
+    "passwd": "",
+    "turma": "T14",
+    "id": 96
+  },
+  "Thies.Hillen@sou.inteli.edu.br": {
+    "name": "Thies David Hillen",
+    "passwd": "",
+    "turma": "T14",
+    "id": 97
   }
 }

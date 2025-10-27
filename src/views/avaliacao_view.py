@@ -40,6 +40,13 @@ class AvaliacaoView:
         
         st.markdown("---")
         
+        # Botão de teste para preenchimento automático
+        if st.button("🧪 Preencher Dados de Teste", type="secondary", use_container_width=True):
+            self._preencher_dados_teste()
+            st.rerun()
+        
+        st.markdown("---")
+        
         # Seleção de sprint (sprint anterior à vigente selecionada automaticamente)
         sprints_disponiveis = self.controller.obter_sprints_disponiveis()
         sprint_anterior = self.controller.obter_sprint_ativa()
@@ -410,3 +417,56 @@ class AvaliacaoView:
             mensagem: Mensagem de sucesso a ser exibida
         """
         st.success(f"✅ {mensagem}")
+    
+    def _preencher_dados_teste(self):
+        """Preenche automaticamente notas e feedbacks para teste rápido"""
+        # Obter alunos do time
+        alunos_time = self.controller.obter_alunos_para_avaliar()
+        nomes_eixos = self.controller.obter_nomes_eixos()
+        
+        # Feedback de teste variado
+        feedbacks_teste = [
+            "Excelente trabalho, muito proativo e organizado",
+            "Bom desempenho, entregou tudo no prazo",
+            "Participou ativamente das reuniões e ajudou a equipe",
+            "Demonstrou boa comunicação e organização",
+            "Trabalhou bem, mas pode melhorar pontualidade",
+            "Contribuiu bem para o projeto, colaborativo",
+            "Desempenho satisfatório, cumpriu as expectativas",
+            "Fez suas entregas, mas poderia ser mais proativo",
+            "Trabalhou conforme o esperado, sem destaque",
+            "Participou das atividades básicas do projeto"
+        ]
+        
+        # Garantir que avaliacoes_temp existe
+        if 'avaliacoes_temp' not in st.session_state:
+            st.session_state.avaliacoes_temp = {}
+        
+        # Preencher para cada aluno
+        for idx, aluno in enumerate(alunos_time):
+            aluno_id = aluno.get('id')
+            if aluno_id:
+                # Inicializar estrutura se não existir
+                if aluno_id not in st.session_state.avaliacoes_temp:
+                    st.session_state.avaliacoes_temp[aluno_id] = {
+                        'notas': [0] * len(nomes_eixos),
+                        'feedbacks': [''] * len(nomes_eixos)
+                    }
+                
+                notas = []
+                feedbacks = []
+                
+                # Preencher cada eixo com notas e feedbacks de teste
+                for eixo_idx, eixo in enumerate(nomes_eixos):
+                    # Distribuir notas de forma variada
+                    nota = 2 if idx % 3 == 0 else 1
+                    feedback = feedbacks_teste[(idx * len(nomes_eixos) + eixo_idx) % len(feedbacks_teste)]
+                    
+                    notas.append(nota)
+                    feedbacks.append(feedback)
+                
+                # Atualizar no session_state
+                st.session_state.avaliacoes_temp[aluno_id]['notas'] = notas
+                st.session_state.avaliacoes_temp[aluno_id]['feedbacks'] = feedbacks
+        
+        st.success("✅ Dados de teste preenchidos! Revise e clique em 'Salvar Avaliações'.")

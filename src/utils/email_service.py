@@ -17,23 +17,37 @@ class EmailService:
     
     def _carregar_config(self) -> Dict[str, Any]:
         """Carrega configuração de email"""
-        # Carregar variáveis de ambiente do arquivo .env
-        load_dotenv('config/email.env')
+        # Carregar variáveis de ambiente do arquivo .env (com override=True para garantir)
+        load_dotenv('config/email.env', override=True)
         
         # Tentar carregar do arquivo JSON primeiro (para compatibilidade)
         try:
             with open('config/email_config.json', 'r', encoding='utf-8') as f:
                 return json.load(f)
         except FileNotFoundError:
-            # Usar variáveis de ambiente
-            return {
+            # Usar variáveis de ambiente (com strip para remover espaços)
+            password = os.getenv("SENDER_PASSWORD", "").strip()
+            email = os.getenv("SENDER_EMAIL", "").strip()
+            
+            print(f"DEBUG - Email carregado: {email}")
+            print(f"DEBUG - Password carregado: {'*' * len(password) if password else 'VAZIO'}")
+            
+            config = {
                 "smtp_server": os.getenv("SMTP_SERVER", "smtp.gmail.com"),
                 "smtp_port": int(os.getenv("SMTP_PORT", "587")),
-                "sender_email": os.getenv("SENDER_EMAIL", "seu-email@gmail.com"),
-                "sender_password": os.getenv("SENDER_PASSWORD", "sua-senha-de-app"),
+                "sender_email": email,
+                "sender_password": password,
                 "use_tls": os.getenv("USE_TLS", "true").lower() == "true",
                 "app_name": os.getenv("APP_NAME", "Sistema de Avaliação de Pares")
             }
+            
+            # Garantir que não há valores vazios
+            if not config["sender_password"]:
+                raise ValueError("SENDER_PASSWORD não foi carregado corretamente do email.env")
+            if not config["sender_email"]:
+                raise ValueError("SENDER_EMAIL não foi carregado corretamente do email.env")
+            
+            return config
     
     def enviar_avaliacoes(self, destinatario: str, nome_usuario: str, avaliacoes_data: Dict[str, Any]) -> tuple[bool, str]:
         """
@@ -291,6 +305,7 @@ class EmailService:
             max_retries: Número máximo de tentativas
         """
         last_exception = None
+        server = None
         
         for attempt in range(max_retries):
             try:
@@ -299,18 +314,13 @@ class EmailService:
                 print(f"📧 Tentativa {attempt + 1}/{max_retries} - Aguardando {delay:.1f}s...")
                 time.sleep(delay)
                 
-                # Criar conexão SMTP
+                # Criar conexão SMTP (EXATAMENTE como no teste que funcionou)
+                print(f"🔄 Conectando a {self.config['smtp_server']}:{self.config['smtp_port']}...")
                 server = smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port'])
-                server.set_debuglevel(0)  # Desabilitar debug para produção
-                
-                # Configurar timeout
-                server.timeout = 30
+                server.set_debuglevel(0)
                 
                 if self.config['use_tls']:
-                    context = ssl.create_default_context()
-                    context.check_hostname = False
-                    context.verify_mode = ssl.CERT_NONE
-                    server.starttls(context=context)
+                    server.starttls()
                 
                 # Login com timeout
                 server.login(self.config['sender_email'], self.config['sender_password'])
@@ -327,17 +337,42 @@ class EmailService:
                 last_exception = e
                 if "temporary system problem" in str(e).lower():
                     print("🔄 Problema temporário detectado, tentando novamente...")
+                    # Fechar servidor antes de continuar
+                    if server:
+                        try:
+                            server.quit()
+                        except:
+                            pass
                     continue
                 else:
+                    # Fechar servidor antes de levantar exceção
+                    if server:
+                        try:
+                            server.quit()
+                        except:
+                            pass
                     raise e  # Erro de autenticação permanente
                     
             except smtplib.SMTPRecipientsRefused as e:
                 print(f"❌ Destinatário recusado (tentativa {attempt + 1}): {str(e)}")
+                # Fechar servidor antes de levantar exceção
+                if server:
+                    try:
+                        server.quit()
+                    except:
+                        pass
                 raise e  # Não tentar novamente para este erro
                 
-            except smtplib.SMTPServerDisconnected as e:
-                print(f"❌ Servidor desconectado (tentativa {attempt + 1}): {str(e)}")
+            except (smtplib.SMTPServerDisconnected, smtplib.SMTPConnectError, ConnectionError, TimeoutError) as e:
+                print(f"❌ Erro de conexão (tentativa {attempt + 1}): {str(e)}")
                 last_exception = e
+                # Fechar servidor antes de continuar
+                if server:
+                    try:
+                        server.quit()
+                    except:
+                        pass
+                server = None  # Resetar para próxima tentativa
                 continue
                 
             except smtplib.SMTPException as e:
@@ -345,20 +380,43 @@ class EmailService:
                 last_exception = e
                 if "temporary" in str(e).lower() or "try again" in str(e).lower():
                     print("🔄 Erro temporário detectado, tentando novamente...")
+                    # Fechar servidor antes de continuar
+                    if server:
+                        try:
+                            server.quit()
+                        except:
+                            pass
+                    server = None
                     continue
                 else:
+                    # Fechar servidor antes de levantar exceção
+                    if server:
+                        try:
+                            server.quit()
+                        except:
+                            pass
                     raise e
                     
             except Exception as e:
                 print(f"❌ Erro inesperado (tentativa {attempt + 1}): {str(e)}")
+                print(f"Tipo do erro: {type(e).__name__}")
                 last_exception = e
+                # Fechar servidor antes de continuar
+                if server:
+                    try:
+                        server.quit()
+                    except:
+                        pass
+                server = None  # Resetar para próxima tentativa
                 continue
                 
             finally:
-                try:
-                    server.quit()
-                except:
-                    pass
+                # Garantir que servidor seja fechado
+                if server:
+                    try:
+                        server.quit()
+                    except:
+                        pass
         
         # Se chegou aqui, todas as tentativas falharam
         raise last_exception or Exception("Falha ao enviar email após todas as tentativas")

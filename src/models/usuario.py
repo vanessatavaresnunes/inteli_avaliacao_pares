@@ -42,33 +42,52 @@ class UsuarioModel:
             print(f"Erro ao carregar dados iniciais de alunos: {e}")
             self.alunos = {}
 
-    def obter_turmas(self) -> list:
-        """Retorna as turmas disponíveis baseadas no arquivo alunos.json principal."""
+    def obter_turmas(self, periodo: str = "2025-2A") -> list:
+        """
+        Retorna as turmas disponíveis baseadas no arquivo alunos.json principal.
+        
+        Args:
+            periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+        """
         try:
             # Carregar o arquivo alunos.json principal
             caminho_arquivo = Path(self.diretorio_config) / "alunos.json"
             if caminho_arquivo.exists():
                 with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
                     dados = json.load(arquivo)
-                    return list(dados.keys())  # Retorna as turmas (T09, T13, T14, etc.)
+                    # Nova estrutura: {periodo: {T09: {...}, T13: {...}}}
+                    if periodo in dados and isinstance(dados[periodo], dict):
+                        return list(dados[periodo].keys())  # Retorna as turmas (T09, T13, etc.)
             return []
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Erro ao carregar turmas do arquivo alunos.json: {e}")
             return []
 
-    def _carregar_alunos(self, turma: str = None) -> Dict[str, List[Dict[str, str]]]:
-        """Carrega dados dos alunos do arquivo alunos.json principal."""
+    def _carregar_alunos(self, turma: str = None, periodo: str = "2025-2A") -> Dict[str, List[Dict[str, str]]]:
+        """
+        Carrega dados dos alunos do arquivo alunos.json principal.
+        
+        Args:
+            turma: Turma específica (opcional)
+            periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+        """
         try:
             caminho_arquivo = Path(self.diretorio_config) / "alunos.json"
             with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
                 dados = json.load(arquivo)
                 
-                # Se uma turma específica foi solicitada, retorna apenas ela
-                if turma and turma in dados:
-                    return {turma: dados[turma]}
+                # Nova estrutura: {periodo: {T09: {...}, T13: {...}}}
+                if periodo in dados:
+                    periodo_data = dados[periodo]
+                    
+                    # Se uma turma específica foi solicitada, retorna apenas ela
+                    if turma and turma in periodo_data:
+                        return {turma: periodo_data[turma]}
+                    
+                    # Se não foi especificada turma, retorna todas do período
+                    return periodo_data
                 
-                # Se não foi especificada turma, retorna todas
-                return dados
+                return {}
                 
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Erro ao carregar alunos do arquivo alunos.json: {e}")
@@ -203,33 +222,47 @@ class UsuarioModel:
             "nota_maxima": nota_maxima
         }
     
-    def obter_times(self, turma: str = None) -> List[str]:
-        """Retorna lista de times disponíveis para a turma informada ou atual."""
+    def obter_times(self, turma: str = None, periodo: str = "2025-2A") -> List[str]:
+        """
+        Retorna lista de times disponíveis para a turma informada ou atual.
+        
+        Args:
+            turma: Turma específica (opcional)
+            periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+        """
         if turma:
-            alunos = self._carregar_alunos(turma)
+            alunos = self._carregar_alunos(turma, periodo)
             return list(alunos.keys())
         return list(self.alunos.keys())
 
-    def obter_alunos_por_time(self, time: str, turma: str = None) -> List[Dict[str, any]]:
+    def obter_alunos_por_time(self, time: str, turma: str = None, periodo: str = "2025-2A") -> List[Dict[str, any]]:
         """
         Retorna lista de alunos de um time específico para a turma informada ou atual.
+        
+        Args:
+            time: Nome do time
+            turma: Turma específica (opcional)
+            periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
         """
         if turma:
-            alunos = self._carregar_alunos(turma)
+            alunos = self._carregar_alunos(turma, periodo)
             return alunos.get(time, [])
         return self.alunos.get(time, [])
     
-    def obter_alunos_time_excluindo(self, time: str, aluno_excluir: str, turma: str = None) -> List[Dict[str, any]]:
+    def obter_alunos_time_excluindo(self, time: str, aluno_excluir: str, turma: str = None, periodo: str = "2025-2A") -> List[Dict[str, any]]:
         """
         Retorna lista de alunos de um time excluindo um aluno específico
+        
         Args:
             time: Nome do time
             aluno_excluir: Nome do aluno a ser excluído
-            turma: Turma a ser considerada
+            turma: Turma a ser considerada (opcional)
+            periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+            
         Returns:
             Lista de alunos do time sem o aluno excluído
         """
-        alunos_time = self.obter_alunos_por_time(time, turma)
+        alunos_time = self.obter_alunos_por_time(time, turma, periodo)
         return [aluno for aluno in alunos_time if aluno['nome'] != aluno_excluir]
     
     def obter_aluno_por_nome(self, nome_aluno: str) -> Optional[Dict[str, any]]:

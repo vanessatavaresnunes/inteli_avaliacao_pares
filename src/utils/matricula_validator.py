@@ -1,22 +1,46 @@
 import json
+import os
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 class MatriculaValidator:
     """Classe para validar matrículas de alunos contra a lista oficial"""
     
-    def __init__(self):
+    def __init__(self, periodo: str = None):
+        """
+        Inicializa o validador de matrículas
+        
+        Args:
+            periodo: Período acadêmico (ex: "2025-2A", "2025-2B"). Se None, usa PERIODO_ATUAL
+        """
         self.alunos_file = Path("data/alunos.json")
         self.usuarios_file = Path("data/usuarios/usuarios.json")
+        
+        # Se não especificado, usar o período atual da variável de ambiente
+        if periodo is None:
+            periodo = os.getenv("PERIODO_ATUAL", "2025-2A")
+        
+        self.periodo = periodo
         self.alunos_data = self._load_alunos()
         self.usuarios_data = self._load_usuarios()
     
     def _load_alunos(self) -> Dict:
-        """Carrega dados dos alunos do arquivo JSON otimizado"""
+        """
+        Carrega dados dos alunos do arquivo JSON otimizado.
+        Nova estrutura: {periodo: {T09: {...}, T13: {...}}}
+        """
         if self.alunos_file.exists():
             try:
                 with open(self.alunos_file, 'r', encoding='utf-8') as f:
-                    return json.load(f)
+                    dados = json.load(f)
+                    # Se for a nova estrutura com períodos, extrair dados do período
+                    if self.periodo in dados and isinstance(dados[self.periodo], dict):
+                        return dados[self.periodo]
+                    return {}
             except (json.JSONDecodeError, FileNotFoundError):
                 return {}
         return {}

@@ -4,6 +4,7 @@ dados/
 !data/alunos.json
 !data/config.json
 !data/eixos.json
+!data/sprint_dates_2025_2a.json
 
 # Permitir versionamento da pasta data/ e arquivos essenciais
 !data/

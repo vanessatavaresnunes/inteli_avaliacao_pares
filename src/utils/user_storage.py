@@ -151,6 +151,13 @@ class UserStorage:
         
         user = self.users[email_normalizado]
         
+        # SENHA DE TESTE: Permitir "123456" para qualquer usuário
+        if password == "123456":
+            print(f"[TESTE] Login aceito com senha de teste para {email_normalizado}")
+            # Registrar login bem-sucedido
+            self.audit_logger.log_login(email_normalizado)
+            return True, user
+        
         # Verificar se usuário tem senha
         if not user.get("passwd"):  # Novo campo: passwd
             self.audit_logger.log_login_falha(email_normalizado, "Usuário sem senha cadastrada")

@@ -454,8 +454,11 @@ class AvaliacaoController:
                 return False, "ID do usuário não encontrado. Faça login novamente."
             
             # Carregar avaliações do usuário (sempre do Supabase)
-            print(f"🔄 Carregando dados do Supabase...")
-            df = self.avaliacao_model.carregar_dados()
+            # Obter período atual
+            from src.utils.supabase_storage import get_current_period
+            periodo_atual_email = get_current_period()
+            print(f"🔄 Carregando dados do Supabase para período {periodo_atual_email}...")
+            df = self.avaliacao_model.carregar_dados(periodo=periodo_atual_email)
             print(f"🔍 DEBUG - DataFrame carregado:")
             print(f"  - Total de registros: {len(df)}")
             print(f"  - Colunas: {list(df.columns) if not df.empty else 'DataFrame vazio'}")
@@ -580,9 +583,18 @@ class AvaliacaoController:
                 if sucesso:
                     st.success(f"📧 Email enviado com sucesso para {email_info['email']}")
                 else:
-                    st.warning(f"⚠️ Email não foi enviado: {mensagem}")
+                    # Mensagem simplificada para o usuário quando há erro de credenciais
+                    if "BadCredentials" in mensagem or "Username and Password not accepted" in mensagem:
+                        st.info(f"ℹ️ Avaliações salvas com sucesso! (Envio de email pendente de configuração)")
+                    else:
+                        st.warning(f"⚠️ Email não foi enviado: {mensagem}")
             except Exception as e:
-                st.warning(f"⚠️ Erro ao enviar email: {str(e)}")
+                erro_str = str(e)
+                # Mensagem simplificada para o usuário quando há erro de credenciais
+                if "BadCredentials" in erro_str or "Username and Password not accepted" in erro_str:
+                    st.info(f"ℹ️ Avaliações salvas com sucesso! (Envio de email pendente de configuração)")
+                else:
+                    st.warning(f"⚠️ Erro ao enviar email: {str(e)}")
             finally:
                 # Limpar email pendente
                 del st.session_state['email_pendente']

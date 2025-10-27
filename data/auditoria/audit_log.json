@@ -563,5 +563,171 @@
     "email": "vanessa.nunes@prof.inteli.edu.br",
     "ip_address": "N/A",
     "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T10:31:10.721519",
+    "acao": "LOGIN_FALHA",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-10-27T10:31:29.385278",
+    "acao": "LOGIN_FALHA",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "motivo": "Usuário não encontrado",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-10-27T10:32:07.450807",
+    "acao": "LOGIN_FALHA",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "motivo": "Senha incorreta",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-10-27T10:32:24.262798",
+    "acao": "LOGIN_FALHA",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "motivo": "Senha incorreta",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-10-27T10:32:24.529116",
+    "acao": "ALTERACAO_SENHA",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T10:32:32.898873",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T10:36:46.479906",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T11:55:18.749785",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T11:57:33.019017",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T11:59:22.747514",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T12:06:47.143464",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T12:14:48.453435",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T12:16:51.588173",
+    "acao": "LOGIN_FALHA",
+    "email": "karine.paixao@sou.inteli.edu.br",
+    "motivo": "Usuário sem senha cadastrada",
+    "ip_address": "N/A",
+    "status": "FALHA"
+  },
+  {
+    "timestamp": "2025-10-27T12:18:43.707206",
+    "acao": "LOGIN",
+    "email": "karine.paixao@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T12:30:21.451809",
+    "acao": "LOGIN",
+    "email": "karine.paixao@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T12:48:46.735777",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T12:53:33.992979",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T12:54:47.756239",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T13:01:19.453622",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T13:08:36.449175",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T13:12:02.823591",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T13:14:45.718350",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T13:17:46.180743",
+    "acao": "LOGIN",
+    "email": "larissa.temoteo@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
   }
 ]

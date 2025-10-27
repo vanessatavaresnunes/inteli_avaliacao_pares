@@ -3,6 +3,12 @@ Aplicativo principal do Sistema de Avaliação de Pares.
 Implementado seguindo o padrão MVC (Model-View-Controller).
 """
 
+import os
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente ANTES de importar outros módulos
+load_dotenv()
+
 import streamlit as st
 from src.controllers.avaliacao_controller import AvaliacaoController
 from src.views.login_view_new import login_view

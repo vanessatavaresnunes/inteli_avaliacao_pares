@@ -1,20 +1,168 @@
 import streamlit as st
 import pandas as pd
-from src.utils.supabase_storage import download_json_from_bucket
+from src.utils.supabase_storage import download_json_from_bucket, get_bucket_for_period
 import json
 import tempfile
 import os
+
+def carregar_alunos_json(periodo: str = "2025-2A"):
+    """
+    Carrega dados dos alunos do arquivo alunos.json para um período específico
+    
+    Args:
+        periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+    """
+    try:
+        with open('data/alunos.json', 'r', encoding='utf-8') as f:
+            dados = json.load(f)
+            # Nova estrutura: {periodo: {T09: {...}, T13: {...}}}
+            if periodo in dados and isinstance(dados[periodo], dict):
+                return dados[periodo]
+            return {}
+    except Exception as e:
+        print(f"Erro ao carregar alunos.json: {e}")
+        return {}
+
+def carregar_sprint_dates(periodo: str = "2025-2A"):
+    """
+    Carrega datas das sprints para um período específico
+    
+    Args:
+        periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+    
+    Returns:
+        Dicionário com informações das sprints
+    """
+    try:
+        if periodo == "2025-2B":
+            arquivo = 'data/sprint_dates_2025_2b.json'
+        else:
+            arquivo = 'data/sprint_dates_2025_2a.json'
+        
+        with open(arquivo, 'r', encoding='utf-8') as f:
+            return json.load(f).get("sprints", {})
+    except Exception as e:
+        print(f"Erro ao carregar sprint_dates: {e}")
+        return {}
 
 st.set_page_config(page_title="Análise das Avaliações", layout="wide")
 
 st.title("🔎 Análise das Avaliações de Pares")
 
+# Seleção de período
+periodos_disponiveis = ["2025-2A", "2025-2B"]
+periodo_atual = st.selectbox(
+    "📅 Selecionar Período:",
+    options=periodos_disponiveis,
+    index=1,  # Default para 2025-2B
+    key="periodo_analise"
+)
+
+st.markdown("---")
+
+# Botões de ação
+col1, col2 = st.columns(2)
+
+with col1:
+    # Botão para forçar a recarga dos dados
+    if st.button("🔄 Recarregar Dados do Consolidado"):
+        with st.spinner(f"Forçando a recriação do arquivo consolidado a partir de todos os dados do bucket de {periodo_atual}..."):
+            try:
+                from src.models.avaliacao import AvaliacaoModel
+                avaliacao_model = AvaliacaoModel()
+                sucesso = avaliacao_model.regenerar_consolidado_de_todos_os_arquivos(periodo=periodo_atual)
+                if sucesso:
+                    st.success("✅ Arquivo consolidado recriado com sucesso!")
+                    st.rerun()  # Recarregar a página para mostrar os novos dados
+                else:
+                    st.error("❌ Erro ao recarregar os dados")
+            except Exception as e:
+                st.error(f"❌ Erro ao recarregar os dados: {e}")
+
+with col2:
+    # Botão para busca direta (contorna limitação de 100 arquivos)
+    if st.button("🎯 Busca Direta por Turma/Sprint"):
+        st.session_state.show_direct_search = True
+        st.rerun()
+
+# Interface de busca direta
+if st.session_state.get('show_direct_search', False):
+    st.markdown("---")
+    st.subheader("🎯 Busca Direta no Supabase")
+    st.info("Esta busca contorna a limitação de 100 arquivos, buscando diretamente por turma e sprint no Supabase.")
+    
+    col_turma, col_sprint, col_buscar = st.columns([2, 2, 1])
+    
+    with col_turma:
+        turma_busca = st.selectbox(
+            "Turma:",
+            options=["T09", "T13", "Teste"],
+            key="turma_busca_direta"
+        )
+    
+    with col_sprint:
+        sprint_busca = st.selectbox(
+            "Sprint:",
+            options=["Sprint 1", "Sprint 2", "Sprint 3", "Sprint 4", "Sprint 5"],
+            key="sprint_busca_direta"
+        )
+    
+    with col_buscar:
+        st.write("")  # Espaçamento
+        if st.button("🔍 Buscar", type="primary"):
+            with st.spinner(f"Buscando dados de {turma_busca} - {sprint_busca}..."):
+                try:
+                    from src.utils.busca_direta_supabase import buscar_avaliacoes_por_turma_sprint
+                    
+                    df_busca = buscar_avaliacoes_por_turma_sprint(turma_busca, sprint_busca, periodo=periodo_atual)
+                    
+                    if not df_busca.empty:
+                        st.success(f"✅ Encontrados {len(df_busca)} registros para {turma_busca} - {sprint_busca}")
+                        
+                        # Atualizar o dataframe principal com os dados encontrados
+                        st.session_state.df_busca_direta = df_busca
+                        st.session_state.turma_busca_atual = turma_busca
+                        st.session_state.sprint_busca_atual = sprint_busca
+                        st.rerun()
+                    else:
+                        st.warning(f"❌ Nenhum dado encontrado para {turma_busca} - {sprint_busca}")
+                        
+                except Exception as e:
+                    st.error(f"❌ Erro na busca: {e}")
+                    import traceback
+                    st.code(traceback.format_exc())
+    
+    if st.button("❌ Fechar Busca Direta"):
+        st.session_state.show_direct_search = False
+        if 'df_busca_direta' in st.session_state:
+            del st.session_state.df_busca_direta
+        if 'turma_busca_atual' in st.session_state:
+            del st.session_state.turma_busca_atual
+        if 'sprint_busca_atual' in st.session_state:
+            del st.session_state.sprint_busca_atual
+        st.rerun()
+    
+    st.markdown("---")
+
+# Se houver dados de busca direta, usar eles ao invés do arquivo consolidado
+if 'df_busca_direta' in st.session_state and not st.session_state.df_busca_direta.empty:
+    df = st.session_state.df_busca_direta
+    st.info(f"📊 Exibindo dados de busca direta: {st.session_state.turma_busca_atual} - {st.session_state.sprint_busca_atual}")
+
 # Carregar dados do arquivo consolidado
-def carregar_dados_consolidados():
-    """Carrega dados do arquivo consolidado do Supabase"""
+def carregar_dados_consolidados(periodo: str = "2025-2A"):
+    """Carrega dados do arquivo consolidado do Supabase
+    
+    Args:
+        periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+    """
     try:
+        # Determinar bucket baseado no período
+        bucket_name = get_bucket_for_period(periodo)
+        st.info(f"📦 Carregando dados do bucket: {bucket_name}")
+        
         with tempfile.NamedTemporaryFile(delete=False, mode="w+b") as tmp:
-            download_json_from_bucket('avaliacoescompletas_consolidadas.json', tmp.name)
+            download_json_from_bucket('avaliacoescompletas_consolidadas.json', tmp.name, bucket_name=bucket_name)
             tmp.seek(0)
             conteudo = tmp.read().decode("utf-8").strip()
             
@@ -42,11 +190,16 @@ def carregar_dados_consolidados():
             pass
 
 # Carregar dados
-df = carregar_dados_consolidados()
+df = carregar_dados_consolidados(periodo_atual)
 
 if df.empty:
     st.warning("Nenhum dado de avaliação encontrado no Supabase.")
     st.stop()
+
+# Verificar se há dados da T13
+turmas_no_df = df['turma'].unique() if not df.empty else []
+if 'T13' not in turmas_no_df:
+    st.info("ℹ️ **Nota sobre a T13**: As avaliações da T13 podem estar no Supabase, mas não aparecem aqui devido a uma limitação técnica na listagem de arquivos (máximo 100 arquivos por requisição). Se você tem certeza de que há avaliações da T13 no sistema, elas podem estar sendo salvas corretamente, mas não estão sendo incluídas no arquivo consolidado devido a essa limitação.")
 
 # Carregar todas as turmas disponíveis (não apenas as com avaliações)
 def carregar_todas_turmas(df_avaliacoes):
@@ -63,12 +216,8 @@ def carregar_todas_turmas(df_avaliacoes):
         turmas_avaliacao = sorted(turmas_validas.unique())
     
     # 2. Turmas do arquivo de alunos (definição oficial)
-    try:
-        with open('data/alunos.json', 'r', encoding='utf-8') as f:
-            alunos_data = json.load(f)
-        turmas_alunos = sorted(list(alunos_data.keys()))
-    except Exception as e:
-        print(f"Erro ao carregar turmas do arquivo de alunos: {e}")
+    alunos_data = carregar_alunos_json(periodo_atual)
+    turmas_alunos = sorted(list(alunos_data.keys()))
     
     # 3. Turmas do arquivo de usuários (fallback)
     try:
@@ -100,26 +249,32 @@ turma_selecionada = st.selectbox("Selecione a turma para análise:", todas_turma
 # Filtrar dados da turma selecionada (se houver dados de avaliação)
 df_turma = df[df['turma'] == turma_selecionada].copy() if not df.empty and 'turma' in df.columns else pd.DataFrame()
 
-# Lógica para corrigir a Sprint das avaliações com base na data de início da Avaliação de Pares
+# Lógica para limpar timestamps inválidos e corrigir a Sprint 5
 if not df_turma.empty:
-    try:
-        with open('data/sprint_dates_2025_2a.json', 'r', encoding='utf-8') as f:
-            sprint_dates_data = json.load(f)
-            sprints_info = sprint_dates_data.get("sprints", {})
-            
-            sprint_5_info = sprints_info.get("sprint_5", {})
-            if "data_avalpares_inicio" in sprint_5_info:
-                data_inicio_s5 = pd.to_datetime(sprint_5_info["data_avalpares_inicio"])
-                
-                # Criar uma nova coluna de data, tratando o timestamp como segundos (Unix time)
-                # Uma nova coluna é usada para manter o timestamp original para ordenação
-                df_turma['timestamp_dt'] = pd.to_datetime(df_turma['timestamp'], unit='s', errors='coerce')
+    # PASSO 1: Normalizar timestamps (segundos e milissegundos)
+    df_turma['timestamp_numeric'] = pd.to_numeric(df_turma['timestamp'], errors='coerce')
+    
+    # Identifica timestamps em milissegundos (números muito grandes) e os converte para segundos
+    is_milliseconds = df_turma['timestamp_numeric'] > 10**12
+    df_turma.loc[is_milliseconds, 'timestamp_numeric'] = df_turma.loc[is_milliseconds, 'timestamp_numeric'] / 1000
+    
+    # Converte para datetime, agora que todos estão em segundos
+    df_turma['timestamp_dt'] = pd.to_datetime(df_turma['timestamp_numeric'], unit='s', errors='coerce')
+    
+    erros_de_data = df_turma['timestamp_dt'].isnull().sum()
+    if erros_de_data > 0:
+        st.warning(f"{erros_de_data} avaliações com timestamp inválido foram ignoradas na análise.")
+        df_turma.dropna(subset=['timestamp_dt'], inplace=True)
 
-                # Identifica as avaliações que deveriam ser da Sprint 5
-                filtro_data = df_turma['timestamp_dt'] >= data_inicio_s5
-                
-                # Aplica a correção
-                df_turma.loc[filtro_data, 'sprint'] = 'Sprint 5'
+    # PASSO 2: Aplicar a regra da Sprint 5 aos dados limpos
+    try:
+        sprints_info = carregar_sprint_dates(periodo_atual)
+        
+        sprint_5_info = sprints_info.get("sprint_5", {})
+        if "data_avalpares_inicio" in sprint_5_info:
+            data_inicio_s5 = pd.to_datetime(sprint_5_info["data_avalpares_inicio"])
+            filtro_data = df_turma['timestamp_dt'] >= data_inicio_s5
+            df_turma.loc[filtro_data, 'sprint'] = 'Sprint 5'
 
     except Exception as e:
         st.warning(f"Não foi possível aplicar a regra de data para a Sprint 5: {e}")
@@ -143,13 +298,9 @@ col1, col2 = st.columns(2)
 
 # Contar grupos do arquivo de alunos (sempre usar a fonte oficial)
 grupos_count = 0
-try:
-    with open('data/alunos.json', 'r', encoding='utf-8') as f:
-        alunos_data = json.load(f)
-    if turma_selecionada in alunos_data:
-        grupos_count = len(alunos_data[turma_selecionada])
-except:
-    pass
+alunos_data = carregar_alunos_json(periodo_atual)
+if turma_selecionada in alunos_data:
+    grupos_count = len(alunos_data[turma_selecionada])
 
 with col1:
     st.metric("Grupos", grupos_count)
@@ -192,15 +343,10 @@ def carregar_todos_grupos_turma(turma):
     grupos_avaliacao = sorted(df_turma["time"].unique()) if not df_turma.empty else []
     
     # Tentar carregar do arquivo de alunos (definição oficial dos grupos)
+    alunos_data = carregar_alunos_json(periodo_atual)
     grupos_alunos = []
-    try:
-        with open('data/alunos.json', 'r', encoding='utf-8') as f:
-            alunos_data = json.load(f)
-        
-        if turma in alunos_data:
-            grupos_alunos = sorted(list(alunos_data[turma].keys()))
-    except Exception as e:
-        print(f"Erro ao carregar grupos do arquivo de alunos: {e}")
+    if turma in alunos_data:
+        grupos_alunos = sorted(list(alunos_data[turma].keys()))
     
     # Tentar carregar do arquivo de usuários (fallback)
     grupos_usuarios = []
@@ -238,13 +384,7 @@ if not tem_avaliacoes:
     st.markdown("---")
 
 # Carregar datas das sprints para filtro especial da Sprint 5
-sprint_dates = {}
-try:
-    with open('data/sprint_dates_2025_2a.json', 'r', encoding='utf-8') as f:
-        sprint_dates_data = json.load(f)
-        sprint_dates = sprint_dates_data.get("sprints", {})
-except Exception as e:
-    print(f"Erro ao carregar datas das sprints: {e}")
+sprint_dates = carregar_sprint_dates(periodo_atual)
 
 for grupo in grupos:
     with st.expander(f"🏢 Grupo: {grupo}", expanded=False):
@@ -256,24 +396,19 @@ for grupo in grupos:
             alunos = []
             
             # Primeiro tentar carregar do arquivo de alunos (definição oficial)
-            try:
-                with open('data/alunos.json', 'r', encoding='utf-8') as f:
-                    alunos_data = json.load(f)
+            alunos_data = carregar_alunos_json(periodo_atual)
+            
+            if turma in alunos_data and grupo in alunos_data[turma]:
+                # Pegar IDs dos alunos do grupo
+                ids_alunos = alunos_data[turma][grupo]
                 
-                if turma in alunos_data and grupo in alunos_data[turma]:
-                    # Pegar IDs dos alunos do grupo
-                    ids_alunos = alunos_data[turma][grupo]
-                    
-                    # Buscar nomes dos alunos no arquivo de usuários
-                    with open('data/usuarios/usuarios.json', 'r', encoding='utf-8') as f:
-                        usuarios = json.load(f)
-                    
-                    for email, dados in usuarios.items():
-                        if dados.get('turma') == turma and dados.get('id') in ids_alunos:
-                            alunos.append(dados.get('name', email))
-                            
-            except Exception as e:
-                print(f"Erro ao carregar alunos do grupo via alunos.json: {e}")
+                # Buscar nomes dos alunos no arquivo de usuários
+                with open('data/usuarios/usuarios.json', 'r', encoding='utf-8') as f:
+                    usuarios = json.load(f)
+                
+                for email, dados in usuarios.items():
+                    if dados.get('turma') == turma and dados.get('id') in ids_alunos:
+                        alunos.append(dados.get('name', email))
             
             # Fallback: tentar carregar do arquivo de usuários diretamente
             if not alunos:
@@ -304,7 +439,10 @@ for grupo in grupos:
         # Combinar alunos dos dados de avaliação com alunos do arquivo de usuários
         alunos_avaliacao = todos_alunos_avaliados.union(todos_alunos_avaliadores)
         alunos_usuarios = set(carregar_alunos_grupo(turma_selecionada, grupo))
-        todos_alunos = sorted(alunos_avaliacao.union(alunos_usuarios))
+        
+        # Filtrar valores None antes da ordenação
+        alunos_avaliacao_filtrado = {aluno for aluno in alunos_avaliacao if aluno is not None}
+        todos_alunos = sorted(alunos_avaliacao_filtrado.union(alunos_usuarios))
         
         # Estatísticas do grupo
         st.metric("Alunos no Grupo", len(todos_alunos))
@@ -336,12 +474,16 @@ for grupo in grupos:
             # Pegar TODOS os alunos do grupo (tanto avaliados quanto avaliadores)
             alunos_avaliados = set(df_sprint_last["nome_avaliado"].unique())
             alunos_avaliadores = set(df_sprint_last["nome_avaliador"].unique())
-            todos_alunos_sprint = sorted(alunos_avaliados.union(alunos_avaliadores))
+            
+            # Filtrar valores None antes da ordenação
+            alunos_avaliados_filtrado = {aluno for aluno in alunos_avaliados if aluno is not None}
+            alunos_avaliadores_filtrado = {aluno for aluno in alunos_avaliadores if aluno is not None}
+            todos_alunos_sprint = sorted(alunos_avaliados_filtrado.union(alunos_avaliadores_filtrado))
             
             eixos = sorted(df_sprint_last["eixo"].unique())
             
-            print(f"  - Alunos avaliados: {sorted(alunos_avaliados)}")
-            print(f"  - Alunos avaliadores: {sorted(alunos_avaliadores)}")
+            print(f"  - Alunos avaliados: {sorted(alunos_avaliados_filtrado)}")
+            print(f"  - Alunos avaliadores: {sorted(alunos_avaliadores_filtrado)}")
             print(f"  - Todos os alunos: {todos_alunos_sprint}")
             
             alunos = todos_alunos_sprint
@@ -352,8 +494,8 @@ for grupo in grupos:
             
             # Debug: verificar dados disponíveis
             print(f"🔍 DEBUG - Grupo: {grupo}, Sprint: {sprint}")
-            print(f"  - Alunos avaliados: {sorted(df_sprint_last['nome_avaliado'].unique())}")
-            print(f"  - Avaliadores (nomes): {sorted(df_sprint_last['nome_avaliador'].unique())}")
+            print(f"  - Alunos avaliados: {sorted([aluno for aluno in df_sprint_last['nome_avaliado'].unique() if aluno is not None])}")
+            print(f"  - Avaliadores (nomes): {sorted([aluno for aluno in df_sprint_last['nome_avaliador'].unique() if aluno is not None])}")
             print(f"  - Avaliadores (IDs): {sorted(df_sprint_last['id_avaliador'].unique())}")
             print(f"  - Total de avaliadores: {n_avaliadores}")
             
@@ -454,7 +596,7 @@ with st.expander("📋 Tabela de Feedbacks", expanded=False):
             df_sprint_last = df_sprint_sorted.groupby([
                 "id_avaliador", "id_avaliado", "eixo"
             ], as_index=False).last()
-            alunos = sorted(df_sprint_last["nome_avaliado"].unique())
+            alunos = sorted([aluno for aluno in df_sprint_last["nome_avaliado"].unique() if aluno is not None])
             for aluno in alunos:
                 linha = {"Aluno": aluno, "Grupo": grupo, "Sprint": sprint}
                 for eixo in ["Entregas reais", "Valor Percebido", "Caixa de Ferramentas"]:
