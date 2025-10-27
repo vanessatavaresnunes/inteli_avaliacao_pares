@@ -20,29 +20,43 @@ class MatriculaValidator:
         self.alunos_file = Path("data/alunos.json")
         self.usuarios_file = Path("data/usuarios/usuarios.json")
         
-        # Se não especificado, usar o período atual da variável de ambiente
-        if periodo is None:
-            periodo = os.getenv("PERIODO_ATUAL", "2025-2A")
+        print("--- DEBUG: MatriculaValidator.__init__ ---")
+        periodo_env = os.getenv("PERIODO_ATUAL", "2025-2A")
+        print(f"PERIODO_ATUAL from env: {periodo_env}")
         
+        if periodo is None:
+            periodo = periodo_env
+        
+        print(f"Using periodo: {periodo}")
         self.periodo = periodo
         self.alunos_data = self._load_alunos()
         self.usuarios_data = self._load_usuarios()
+        print("--- END DEBUG: MatriculaValidator.__init__ ---")
     
     def _load_alunos(self) -> Dict:
         """
         Carrega dados dos alunos do arquivo JSON otimizado.
         Nova estrutura: {periodo: {T09: {...}, T13: {...}}}
         """
+        print("--- DEBUG: MatriculaValidator._load_alunos ---")
         if self.alunos_file.exists():
             try:
                 with open(self.alunos_file, 'r', encoding='utf-8') as f:
                     dados = json.load(f)
-                    # Se for a nova estrutura com períodos, extrair dados do período
+                    print(f"Loaded alunos.json content: {dados}")
                     if self.periodo in dados and isinstance(dados[self.periodo], dict):
+                        print(f"Found data for period {self.periodo}: {dados[self.periodo]}")
+                        print("--- END DEBUG: MatriculaValidator._load_alunos ---")
                         return dados[self.periodo]
+                    print(f"Data for period {self.periodo} not found or not a dict.")
+                    print("--- END DEBUG: MatriculaValidator._load_alunos ---")
                     return {}
-            except (json.JSONDecodeError, FileNotFoundError):
+            except (json.JSONDecodeError, FileNotFoundError) as e:
+                print(f"Error loading alunos.json: {e}")
+                print("--- END DEBUG: MatriculaValidator._load_alunos ---")
                 return {}
+        print("alunos.json not found.")
+        print("--- END DEBUG: MatriculaValidator._load_alunos ---")
         return {}
     
     def _load_usuarios(self) -> Dict:

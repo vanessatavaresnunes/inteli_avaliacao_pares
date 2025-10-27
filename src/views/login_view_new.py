@@ -1,13 +1,21 @@
 import streamlit as st
+import os
+from dotenv import load_dotenv
 from src.utils.user_storage import UserStorage
 from src.utils.matricula_validator import MatriculaValidator
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 def login_view():
     """Tela de login principal"""
     
+    # Determinar período atual
+    periodo_atual = os.getenv("PERIODO_ATUAL", "2025-2A")
+    
     # Inicializar storage de usuários e validador
     user_storage = UserStorage()
-    matricula_validator = MatriculaValidator()
+    matricula_validator = MatriculaValidator(periodo=periodo_atual)
     
     st.title("🔐 Login - Sistema de Avaliação de Pares")
     st.markdown("---")

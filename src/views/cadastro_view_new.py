@@ -1,7 +1,12 @@
 import streamlit as st
+import os
+from dotenv import load_dotenv
 from src.utils.user_storage import UserStorage
 from src.utils.matricula_validator import MatriculaValidator
 import json
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 def cadastro_view():
     """Tela de cadastro de novos usuários com validação de matrícula"""
@@ -47,9 +52,12 @@ def cadastro_view():
         
         return True
     
+    # Determinar período atual
+    periodo_atual = os.getenv("PERIODO_ATUAL", "2025-2A")
+    
     # Inicializar storage de usuários e validador
     user_storage = UserStorage()
-    matricula_validator = MatriculaValidator()
+    matricula_validator = MatriculaValidator(periodo=periodo_atual)
     
     st.title("📝 Cadastro de Novo Usuário")
     st.markdown("---")

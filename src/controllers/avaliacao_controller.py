@@ -6,19 +6,38 @@ Responsável por coordenar entre modelos e views.
 from typing import Dict, List, Optional, Tuple
 import streamlit as st
 import json
+import os
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from src.models.avaliacao import AvaliacaoModel
 from src.models.usuario import UsuarioModel
 from src.utils.matricula_validator import MatriculaValidator
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 
 class AvaliacaoController:
     """Controller responsável por gerenciar a lógica de avaliações"""
     
-    def __init__(self):
+    def __init__(self, periodo: str = None):
+        """
+        Inicializa o controller
+        
+        Args:
+            periodo: Período acadêmico (ex: "2025-2A", "2025-2B"). Se None, usa PERIODO_ATUAL
+        """
+        # Determinar período a ser usado
+        if periodo is None:
+            periodo = os.getenv("PERIODO_ATUAL", "2025-2A")
+        
+        print(f"--- DEBUG: AvaliacaoController.__init__ ---")
+        print(f"Using periodo: {periodo}")
+        print(f"--- END DEBUG: AvaliacaoController.__init__ ---")
+        
         self.avaliacao_model = AvaliacaoModel()
         self.usuario_model = UsuarioModel()
-        self.matricula_validator = MatriculaValidator()
+        self.matricula_validator = MatriculaValidator(periodo=periodo)
     
     def inicializar_sessao(self):
         """Inicializa a sessão do Streamlit se necessário"""
