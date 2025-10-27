@@ -276,8 +276,14 @@ class UsuarioModel:
             Dicionário com os dados do aluno ou None se não encontrado.
         """
         for time in self.alunos.values():
+            # Verificar se time é uma lista
+            if not isinstance(time, list):
+                continue
             for aluno in time:
-                if unicodedata.normalize('NFC', aluno['nome']) == unicodedata.normalize('NFC', nome_aluno):
+                # Verificar se aluno é um dicionário
+                if not isinstance(aluno, dict):
+                    continue
+                if 'nome' in aluno and unicodedata.normalize('NFC', str(aluno['nome'])) == unicodedata.normalize('NFC', nome_aluno):
                     return aluno
         return None
 

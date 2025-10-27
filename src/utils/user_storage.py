@@ -21,7 +21,12 @@ class UserStorage:
                 with open(self.users_file, 'r', encoding='utf-8') as f:
                     users_raw = json.load(f)
                     # Normalizar todas as chaves de email para minúsculas
-                    self.users = {email.lower(): data for email, data in users_raw.items()}
+                    # Garantir que 'data' é um dicionário
+                    self.users = {
+                        email.lower(): data 
+                        for email, data in users_raw.items() 
+                        if isinstance(data, dict)
+                    }
             except (json.JSONDecodeError, FileNotFoundError):
                 self.users = {}
         else:
