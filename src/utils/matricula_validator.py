@@ -115,10 +115,24 @@ class MatriculaValidator:
     
     def obter_alunos_por_grupo(self, turma: str, grupo: str) -> List[Dict]:
         """Retorna alunos de um grupo específico com dados completos"""
-        if turma not in self.alunos_data or grupo not in self.alunos_data[turma]:
+        print(f"--- DEBUG: obter_alunos_por_grupo ---")
+        print(f"  Periodo: {self.periodo}")
+        print(f"  Turma: {turma}")
+        print(f"  Grupo: {grupo}")
+        print(f"  alunos_data keys: {list(self.alunos_data.keys())}")
+        
+        if turma not in self.alunos_data:
+            print(f"  ❌ Turma {turma} não encontrada em alunos_data")
+            return []
+        
+        if grupo not in self.alunos_data[turma]:
+            print(f"  ❌ Grupo {grupo} não encontrado na turma {turma}")
+            print(f"  Grupos disponíveis: {list(self.alunos_data[turma].keys())}")
             return []
         
         alunos_ids = self.alunos_data[turma][grupo]
+        print(f"  Alunos IDs no grupo: {alunos_ids}")
+        
         alunos_completos = []
         
         # Buscar dados completos dos usuários
@@ -131,6 +145,11 @@ class MatriculaValidator:
                     'email': email,
                     'passwd': usuario.get('passwd', '')
                 })
+        
+        print(f"  Alunos completos encontrados: {len(alunos_completos)}")
+        for aluno in alunos_completos:
+            print(f"    - {aluno['nome']} (ID: {aluno['id']})")
+        print(f"--- END DEBUG: obter_alunos_por_grupo ---")
         
         return sorted(alunos_completos, key=lambda x: x['id'])
     
@@ -145,13 +164,27 @@ class MatriculaValidator:
         Returns:
             Nome do grupo ou "Grupo não encontrado"
         """
+        print(f"--- DEBUG: _encontrar_grupo_por_id ---")
+        print(f"  Periodo: {self.periodo}")
+        print(f"  Turma: {turma}")
+        print(f"  Aluno ID: {aluno_id}")
+        print(f"  alunos_data keys: {list(self.alunos_data.keys())}")
+        
         if turma not in self.alunos_data:
+            print(f"  ❌ Turma {turma} não encontrada em alunos_data")
+            print(f"  Turmas disponíveis: {list(self.alunos_data.keys())}")
             return "Grupo não encontrado"
         
+        print(f"  Grupos na turma {turma}: {list(self.alunos_data[turma].keys())}")
         for grupo, ids_alunos in self.alunos_data[turma].items():
+            print(f"    - {grupo}: IDs {ids_alunos}")
             if aluno_id in ids_alunos:
+                print(f"  ✅ Encontrado no grupo: {grupo}")
+                print(f"--- END DEBUG: _encontrar_grupo_por_id ---")
                 return grupo
         
+        print(f"  ❌ Aluno ID {aluno_id} não encontrado em nenhum grupo")
+        print(f"--- END DEBUG: _encontrar_grupo_por_id ---")
         return "Grupo não encontrado"
     
     def obter_todas_matriculas(self) -> List[Dict]:

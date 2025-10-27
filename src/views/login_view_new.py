@@ -12,6 +12,9 @@ def login_view():
     
     # Determinar período atual
     periodo_atual = os.getenv("PERIODO_ATUAL", "2025-2A")
+    print(f"=== DEBUG: login_view ===")
+    print(f"PERIODO_ATUAL from env: '{periodo_atual}'")
+    print(f"=== END DEBUG: login_view ===")
     
     # Inicializar storage de usuários e validador
     user_storage = UserStorage()
@@ -64,7 +67,9 @@ def login_view():
                         st.success(f"✅ Bem-vindo, {user_info['name']}!")  # Novo campo: name
                         
                         # Buscar informações completas do usuário incluindo grupo
+                        print(f"=== DEBUG: Buscando dados completos para {email} ===")
                         dados_completos = matricula_validator.buscar_aluno_por_email(email)
+                        print(f"=== DEBUG: dados_completos = {dados_completos} ===")
                         
                         # Armazenar informações na sessão
                         st.session_state["user_email"] = email.lower()  # Normalizar para minúsculas
