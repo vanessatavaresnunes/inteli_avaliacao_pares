@@ -43,20 +43,24 @@ class AvaliacaoView:
         st.markdown("---")
         
         # Botão de teste apenas em ambiente local de desenvolvimento
-        # Verifica se é ambiente de desenvolvimento (local)
-        is_local = os.getenv("ENVIRONMENT", "production").lower() == "development"
+        # Por padrão, assume produção (seguro)
+        is_production = os.getenv("ENVIRONMENT", "production").lower() == "production"
         
-        # Se não definida variável ENVIRONMENT, verificar se está rodando localmente
-        if not is_local:
-            # Aproximação: se está rodando em localhost, é desenvolvimento
-            hostname = socket.gethostname().lower()
-            is_local = (
-                "localhost" in hostname or
-                "127.0.0.1" in hostname or
-                hostname.startswith("desktop") or
-                hostname.startswith("laptop") or
-                "home" in hostname
-            )
+        # Detecta se está rodando localmente verificando hostname
+        hostname = socket.gethostname().lower()
+        is_local_hostname = (
+            "localhost" in hostname or
+            "127.0.0.1" in hostname or
+            hostname.startswith("desktop") or
+            hostname.startswith("laptop") or
+            "home" in hostname or
+            hostname.startswith("pc-") or
+            hostname.startswith("computer")
+        )
+        
+        # Mostra botão APENAS se explicitamente definido como development
+        # E se estiver rodando localmente
+        is_local = (not is_production) and is_local_hostname
         
         if is_local:
             if st.button("🧪 Preencher Dados de Teste", type="secondary", use_container_width=True):
