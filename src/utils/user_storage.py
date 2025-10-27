@@ -19,7 +19,9 @@ class UserStorage:
         if self.users_file.exists():
             try:
                 with open(self.users_file, 'r', encoding='utf-8') as f:
-                    self.users = json.load(f)
+                    users_raw = json.load(f)
+                    # Normalizar todas as chaves de email para minúsculas
+                    self.users = {email.lower(): data for email, data in users_raw.items()}
             except (json.JSONDecodeError, FileNotFoundError):
                 self.users = {}
         else:
