@@ -3,6 +3,8 @@ View para a tela de avaliação do aplicativo.
 Responsável pela interface de avaliação de pares.
 """
 
+import os
+import socket
 import streamlit as st
 from src.controllers.avaliacao_controller import AvaliacaoController
 
@@ -40,10 +42,26 @@ class AvaliacaoView:
         
         st.markdown("---")
         
-        # Botão de teste para preenchimento automático
-        if st.button("🧪 Preencher Dados de Teste", type="secondary", use_container_width=True):
-            self._preencher_dados_teste()
-            st.rerun()
+        # Botão de teste apenas em ambiente local de desenvolvimento
+        # Verifica se é ambiente de desenvolvimento (local)
+        is_local = os.getenv("ENVIRONMENT", "production").lower() == "development"
+        
+        # Se não definida variável ENVIRONMENT, verificar se está rodando localmente
+        if not is_local:
+            # Aproximação: se está rodando em localhost, é desenvolvimento
+            hostname = socket.gethostname().lower()
+            is_local = (
+                "localhost" in hostname or
+                "127.0.0.1" in hostname or
+                hostname.startswith("desktop") or
+                hostname.startswith("laptop") or
+                "home" in hostname
+            )
+        
+        if is_local:
+            if st.button("🧪 Preencher Dados de Teste", type="secondary", use_container_width=True):
+                self._preencher_dados_teste()
+                st.rerun()
         
         st.markdown("---")
         
