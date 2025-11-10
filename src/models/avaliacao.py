@@ -394,8 +394,8 @@ class AvaliacaoModel:
             bucket_name = get_bucket_for_period(periodo)
             print(f"📦 Usando bucket: {bucket_name}")
             
-            # Listar todos os arquivos de avaliação no bucket
-            arquivos = list_json_files_in_bucket(bucket_name=bucket_name)
+            # Listar todos os arquivos de avaliação no bucket (com paginação)
+            arquivos = list_json_files_in_bucket(prefix="", bucket_name=bucket_name)
             arquivos_avaliacao = [f for f in arquivos if f.startswith('aval_') and f.endswith('.json')]
             
             if not arquivos_avaliacao:

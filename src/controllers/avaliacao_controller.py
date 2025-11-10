@@ -4,6 +4,7 @@ Responsável por coordenar entre modelos e views.
 """
 
 from typing import Dict, List, Optional, Tuple
+from pathlib import Path
 import streamlit as st
 import json
 import os
@@ -37,6 +38,7 @@ class AvaliacaoController:
         
         self.avaliacao_model = AvaliacaoModel()
         self.usuario_model = UsuarioModel()
+        self.periodo = periodo
         self.matricula_validator = MatriculaValidator(periodo=periodo)
     
     def inicializar_sessao(self):
@@ -654,7 +656,14 @@ class AvaliacaoController:
             Dicionário com os dados das sprints
         """
         try:
-            with open('data/sprint_dates_2025_2a.json', 'r', encoding='utf-8') as f:
+            periodo = getattr(self, "periodo", os.getenv("PERIODO_ATUAL", "2025-2A"))
+            periodo_slug = periodo.lower().replace('-', '_')
+            arquivo_periodo = Path(f"data/sprint_dates_{periodo_slug}.json")
+            if not arquivo_periodo.exists():
+                print(f"⚠️ Arquivo de sprints para {periodo} não encontrado em {arquivo_periodo}. Usando fallback 2025-2A.")
+                arquivo_periodo = Path("data/sprint_dates_2025_2a.json")
+
+            with arquivo_periodo.open('r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
             st.error(f"Erro ao carregar dados das sprints: {e}")

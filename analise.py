@@ -196,10 +196,8 @@ if df.empty:
     st.warning("Nenhum dado de avaliação encontrado no Supabase.")
     st.stop()
 
-# Verificar se há dados da T13
+# Verificar presença de T13 (sem alerta de limitação; paginação já implementada)
 turmas_no_df = df['turma'].unique() if not df.empty else []
-if 'T13' not in turmas_no_df:
-    st.info("ℹ️ **Nota sobre a T13**: As avaliações da T13 podem estar no Supabase, mas não aparecem aqui devido a uma limitação técnica na listagem de arquivos (máximo 100 arquivos por requisição). Se você tem certeza de que há avaliações da T13 no sistema, elas podem estar sendo salvas corretamente, mas não estão sendo incluídas no arquivo consolidado devido a essa limitação.")
 
 # Carregar todas as turmas disponíveis (não apenas as com avaliações)
 def carregar_todas_turmas(df_avaliacoes):

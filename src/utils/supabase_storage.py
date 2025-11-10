@@ -96,29 +96,55 @@ def download_json_from_bucket(bucket_path: str, local_path: str, bucket_name: st
     with open(local_path, "wb") as f:
         f.write(res)
 
-def list_json_files_in_bucket(prefix: str = ""):  # Ex: prefix="avaliacoes_"
-    """Lista arquivos JSON no bucket que começam com determinado prefixo no nome."""
-    supabase = get_supabase_client()
+def list_json_files_in_bucket(prefix: str = "", bucket_name: Optional[str] = None, path: str = ""):
+    """Lista arquivos JSON no bucket (com paginação), opcionalmente filtrando por prefixo.
     
+    Args:
+        prefix: Prefixo que o nome do arquivo deve começar (ex: "aval_")
+        bucket_name: Nome do bucket a usar; se None, usa BUCKET_NAME
+        path: Caminho/pasta dentro do bucket (default raiz)
+    """
+    supabase = get_supabase_client()
+    bucket = bucket_name or BUCKET_NAME
+
     try:
-        # Se não há prefixo específico, listar todos os arquivos
-        if not prefix:
-            files = supabase.storage.from_(BUCKET_NAME).list()
-        else:
-            # Para prefixos específicos, usar busca mais eficiente
-            files = supabase.storage.from_(BUCKET_NAME).list()
-        
-        # Filtrar arquivos JSON que começam com o prefixo
+        all_files = []
+        offset = 0
+        limit = 1000
+
+        while True:
+            files_batch = supabase.storage.from_(bucket).list(
+                path=path,
+                options={
+                    "limit": limit,
+                    "offset": offset,
+                    "sortBy": {"column": "created_at", "order": "desc"}
+                }
+            )
+
+            if not files_batch:
+                break
+
+            all_files.extend(files_batch)
+
+            if len(files_batch) < limit:
+                break
+
+            offset += len(files_batch)
+
         filtered_files = [
-            f["name"] for f in files 
-            if f["name"].startswith(prefix) and f["name"].endswith(".json")
+            f["name"] for f in all_files
+            if (not prefix or f["name"].startswith(prefix)) and f["name"].endswith(".json")
         ]
-        
-        print(f"📊 Total de arquivos listados: {len(files)}")
-        print(f"📊 Arquivos JSON com prefixo '{prefix}': {len(filtered_files)}")
-        
+
+        try:
+            print(f"📊 Total de arquivos listados em '{bucket}': {len(all_files)}")
+            print(f"📊 Arquivos JSON com prefixo '{prefix}': {len(filtered_files)}")
+        except Exception:
+            pass
+
         return filtered_files
-        
+
     except Exception as e:
         print(f"❌ Erro ao listar arquivos: {e}")
         return []

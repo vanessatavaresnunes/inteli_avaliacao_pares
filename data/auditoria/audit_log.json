@@ -729,5 +729,54 @@
     "email": "larissa.temoteo@sou.inteli.edu.br",
     "ip_address": "N/A",
     "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T15:44:58.873665",
+    "acao": "LOGIN",
+    "email": "pedro.faria@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T15:46:01.881550",
+    "acao": "LOGIN",
+    "email": "pedro.faria@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T16:16:24.473580",
+    "acao": "LOGIN",
+    "email": "pedro.faria@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-10-27T16:40:30.885940",
+    "acao": "LOGIN",
+    "email": "pedro.faria@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-11-10T12:51:35.867673",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-11-10T12:54:32.515251",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2025-11-10T12:59:07.555959",
+    "acao": "LOGIN",
+    "email": "vanessa.nunes@prof.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
   }
 ]
