@@ -16,16 +16,69 @@ def carregar_usuarios():
     with open('data/usuarios/usuarios.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
-def calcular_nota_final(total_aluno, media_geral, amplitude):
+def calcular_k_por_tamanho_grupo(n: int) -> int:
     """
-    Calcula a nota final usando a fórmula:
-    Nota Final = (Total do Aluno - Média Geral) / (0.6 × Amplitude)
-    """
-    if amplitude == 0:
-        return 0
+    Calcula o valor de K (lastro) baseado no tamanho do grupo N.
     
-    nota_final = (total_aluno - media_geral) / (0.6 * amplitude)
-    return round(nota_final, 2)
+    Valores de K para o período 2025-2B:
+    - N=4 → K=9
+    - N=5 → K=14
+    - N=6 → K=44
+    - N=7 → K=54
+    - N=8 → K=99
+    
+    Args:
+        n: Tamanho do grupo (número de integrantes)
+        
+    Returns:
+        Valor de K correspondente ao tamanho do grupo
+    """
+    k_map = {
+        4: 9,
+        5: 14,
+        6: 44,
+        7: 54,
+        8: 99
+    }
+    return k_map.get(n, 54)  # Default para N=7 se não estiver no mapa
+
+def calcular_nota_final(total_aluno, media_geral, amplitude, n_alunos=None, periodo="2025-2A"):
+    """
+    Calcula a nota final usando a fórmula apropriada baseada no período.
+    
+    Para 2025-2B: Índice = fator × (Px - Pmédi) / ((Pmax - Pmin) + K)
+                   Com limite entre -0.4 e +0.4
+    Para outros períodos: Nota Final = (Total do Aluno - Média Geral) / (0.6 × Amplitude)
+    
+    Args:
+        total_aluno: Total de pontos do aluno (Px)
+        media_geral: Média geral dos pontos (Pmédi)
+        amplitude: Amplitude (Pmax - Pmin)
+        n_alunos: Tamanho do grupo (N) - necessário para período 2025-2B
+        periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+    """
+    if periodo == "2025-2B" and n_alunos is not None:
+        # Nova fórmula: Índice = fator × (Px - Pmédi) / ((Pmax - Pmin) + K) com limite
+        fator = 7.5
+        limite = 0.4
+        k = calcular_k_por_tamanho_grupo(n_alunos)
+        denominador = amplitude + k
+        if denominador == 0:
+            return 0.0
+        indice_calculado = fator * (total_aluno - media_geral) / denominador
+        # Limitar entre -limite e +limite
+        nota_final = max(-limite, min(limite, indice_calculado))
+        return round(nota_final, 2)
+    else:
+        # Fórmula antiga: Nota Final = (Total do Aluno - Média Geral) / (0.6 × Amplitude)
+        if amplitude == 0:
+            return 0
+        nota_final = (total_aluno - media_geral) / (0.6 * amplitude)
+        return round(nota_final, 2)
+
+def obter_periodo_atual():
+    """Obtém o período atual da variável de ambiente"""
+    return os.getenv("PERIODO_ATUAL", "2025-2A")
 
 def main():
     print("🔢 CÁLCULO DE NOTAS FINAIS - SPRINT 5 - T13")
@@ -148,6 +201,7 @@ def main():
     
     # Carregar dados de usuários
     usuarios_data = carregar_usuarios()
+    periodo = obter_periodo_atual()
     
     # Processar por grupo
     grupos = sorted(df['time'].unique())
@@ -187,6 +241,8 @@ def main():
             min_nota = min(totais)
             amplitude = max_nota - min_nota
             
+            n_alunos = len(notas_por_aluno)  # Tamanho do grupo (N)
+            
             print(f"📊 Estatísticas do Grupo:")
             print(f"   Média Geral: {media_geral:.2f}")
             print(f"   Nota Máxima: {max_nota}")
@@ -219,7 +275,7 @@ def main():
                         ferramentas += nota
                 
                 # Calcular nota final
-                nota_final = calcular_nota_final(total, media_geral, amplitude)
+                nota_final = calcular_nota_final(total, media_geral, amplitude, n_alunos=n_alunos, periodo=periodo)
                 
                 print(f"{nome:<40} {entregas:<12} {valor:<12} {ferramentas:<15} {total:<8} {nota_final:<12}")
             
@@ -227,9 +283,16 @@ def main():
             
             # Mostrar fórmula
             print(f"📐 Fórmula da Nota Final:")
-            print(f"   Nota Final = (Total do Aluno - Média Geral) / (0.6 × Amplitude)")
-            print(f"   Nota Final = (Total - {media_geral:.2f}) / (0.6 × {amplitude})")
-            print(f"   Nota Final = (Total - {media_geral:.2f}) / {0.6 * amplitude:.2f}\n")
+            if periodo == "2025-2B":
+                k = calcular_k_por_tamanho_grupo(n_alunos)
+                print(f"   Índice = 7.5 × (Px - Pmédi) / ((Pmax - Pmin) + K)")
+                print(f"   Índice = 7.5 × (Total - {media_geral:.2f}) / (({max_nota} - {min_nota}) + {k})")
+                print(f"   Índice = 7.5 × (Total - {media_geral:.2f}) / {amplitude + k:.2f}")
+                print(f"   Limite: entre -0.4 e +0.4\n")
+            else:
+                print(f"   Nota Final = (Total do Aluno - Média Geral) / (0.6 × Amplitude)")
+                print(f"   Nota Final = (Total - {media_geral:.2f}) / (0.6 × {amplitude})")
+                print(f"   Nota Final = (Total - {media_geral:.2f}) / {0.6 * amplitude:.2f}\n")
         else:
             print("❌ Nenhum dado encontrado para este grupo")
     

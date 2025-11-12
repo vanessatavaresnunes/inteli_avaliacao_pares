@@ -5,6 +5,59 @@ import json
 import tempfile
 import os
 
+def calcular_k_por_tamanho_grupo(n: int) -> int:
+    """
+    Calcula o valor de K (lastro) baseado no tamanho do grupo N.
+    
+    Valores de K para o período 2025-2B:
+    - N=4 → K=9
+    - N=5 → K=14
+    - N=6 → K=44
+    - N=7 → K=54
+    - N=8 → K=99
+    
+    Args:
+        n: Tamanho do grupo (número de integrantes)
+        
+    Returns:
+        Valor de K correspondente ao tamanho do grupo
+    """
+    k_map = {
+        4: 9,
+        5: 14,
+        6: 44,
+        7: 54,
+        8: 99
+    }
+    return k_map.get(n, 54)  # Default para N=7 se não estiver no mapa
+
+def calcular_indice_nova_formula(px: float, p_medio: float, p_max: float, p_min: float, n: int) -> float:
+    """
+    Calcula o índice usando a nova fórmula para o período 2025-2B:
+    Índice = fator × (Px - Pmédi) / ((Pmax - Pmin) + K)
+    Com limite entre -0.4 e +0.4
+    
+    Args:
+        px: Pontos do aluno individual
+        p_medio: Média dos pontos
+        p_max: Máximo de pontos
+        p_min: Mínimo de pontos
+        n: Tamanho do grupo (para calcular K)
+        
+    Returns:
+        Índice calculado (limitado entre -0.4 e +0.4)
+    """
+    fator = 7.5
+    limite = 0.4
+    k = calcular_k_por_tamanho_grupo(n)
+    denominador = (p_max - p_min) + k
+    if denominador == 0:
+        return 0.0
+    indice_calculado = fator * (px - p_medio) / denominador
+    # Limitar entre -limite e +limite
+    indice_limitado = max(-limite, min(limite, indice_calculado))
+    return round(indice_limitado, 1)
+
 def carregar_alunos_json(periodo: str = "2025-2A"):
     """
     Carrega dados dos alunos do arquivo alunos.json para um período específico
@@ -569,8 +622,18 @@ for grupo in grupos:
                 medias = df_result["Total"].mean()
                 maior = df_result["Total"].max()
                 menor = df_result["Total"].min()
-                denominador = 0.6 * (maior - menor) if maior != menor else 1
-                df_result["Nota"] = ((df_result["Total"] - medias) / denominador).round(1)
+                n_alunos = len(df_result)  # Tamanho do grupo (N)
+                
+                # Usar nova fórmula para período 2025-2B, fórmula antiga para outros períodos
+                if periodo_atual == "2025-2B":
+                    # Nova fórmula: Índice = (Px - Pmédi) / ((Pmax - Pmin) + K)
+                    df_result["Nota"] = df_result["Total"].apply(
+                        lambda px: calcular_indice_nova_formula(px, medias, maior, menor, n_alunos)
+                    )
+                else:
+                    # Fórmula antiga: (Total - Média) / (0.6 × Amplitude)
+                    denominador = 0.6 * (maior - menor) if maior != menor else 1
+                    df_result["Nota"] = ((df_result["Total"] - medias) / denominador).round(1)
             
             # Exibir tabela com nomes coloridos
             st.markdown(
