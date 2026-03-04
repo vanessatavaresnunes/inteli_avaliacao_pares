@@ -14,7 +14,19 @@ from src.utils.supabase_storage import get_bucket_for_period, get_current_period
 import tempfile
 import json
 
-def verificar_consolidado(periodo: str = None):
+def carregar_dados_avaliacoes(periodo: str = "2026-1A") -> pd.DataFrame:
+    """
+    Carrega dados do arquivo consolidado do Supabase
+    
+    Args:
+        periodo: Período acadêmico (ex: "2025-2A", "2025-2B", "2026-1A"). Se None, usa o período atual.
+    """
+    if periodo is None:
+        periodo = get_current_period()
+    
+    print("=" * 80)
+
+def verificar_consolidado(periodo: str = "2026-1A"):
     """
     Verifica o estado do arquivo consolidado e compara com arquivos individuais.
     

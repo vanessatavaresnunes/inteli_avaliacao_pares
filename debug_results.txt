@@ -1,0 +1,84 @@
+--- TESTING MATRICULA VALIDATOR ---
+Grupos T17: ['Grupo 1', 'Grupo 2', 'Grupo 3', 'Grupo 4', 'Grupo 5']
+Alunos no Grupo 1: [
+  {
+    "id": 11,
+    "nome": "Giacomo Zema Matizonkas",
+    "email": "giacomo.matizonkas@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 12,
+    "nome": "Henrique Milliorini Botti",
+    "email": "henrique.botti@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 101,
+    "nome": "Carlos Eduardo Serrano Quaglia",
+    "email": "carlos.quaglia@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 114,
+    "nome": "Lucas Picinato Rogero",
+    "email": "lucas.rogero@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 116,
+    "nome": "Mariana Pereira de Souza",
+    "email": "mariana.pereira@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 118,
+    "nome": "Mirela Schneider Bianchi",
+    "email": "mirela.bianchi@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 119,
+    "nome": "Nicholas Anantha Krishnan Millani",
+    "email": "nicholas.millani@sou.inteli.edu.br",
+    "passwd": ""
+  }
+]
+Alunos para avaliar (Giacomo Zema Matizonkas): [
+  {
+    "id": 12,
+    "nome": "Henrique Milliorini Botti",
+    "email": "henrique.botti@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 101,
+    "nome": "Carlos Eduardo Serrano Quaglia",
+    "email": "carlos.quaglia@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 114,
+    "nome": "Lucas Picinato Rogero",
+    "email": "lucas.rogero@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 116,
+    "nome": "Mariana Pereira de Souza",
+    "email": "mariana.pereira@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 118,
+    "nome": "Mirela Schneider Bianchi",
+    "email": "mirela.bianchi@sou.inteli.edu.br",
+    "passwd": ""
+  },
+  {
+    "id": 119,
+    "nome": "Nicholas Anantha Krishnan Millani",
+    "email": "nicholas.millani@sou.inteli.edu.br",
+    "passwd": ""
+  }
+]

@@ -10,7 +10,7 @@ from src.utils.supabase_storage import download_json_from_bucket, list_json_file
 import pandas as pd
 
 
-def carregar_datas_sprints(periodo: str = "2025-2A"):
+def carregar_datas_sprints(periodo: str = "2026-1A"):
     """
     Carrega as datas das sprints do arquivo de configuração
     
@@ -32,7 +32,7 @@ def carregar_datas_sprints(periodo: str = "2025-2A"):
         return {}
 
 
-def buscar_avaliacoes_por_turma_sprint(turma, sprint, periodo: str = "2025-2A"):
+def buscar_avaliacoes_por_turma_sprint(turma, sprint, periodo: str = "2026-1A"):
     """
     Busca avaliações diretamente no Supabase filtrando por turma e sprint.
     Para Sprint 5, também considera a data de início da avaliação de pares.
@@ -214,8 +214,8 @@ def buscar_arquivos_especificos_turma(turma, sprint):
         ]
         
         # Listar arquivos e filtrar pelos prefixos
-        # Use bucket padrão (2025-2A) por enquanto
-        bucket_name = get_bucket_for_period("2025-2A")
+        # Use bucket padrão (2026-1A) por enquanto
+        bucket_name = get_bucket_for_period("2026-1A")
         arquivos_base = supabase.storage.from_(bucket_name).list()
         
         for arquivo in arquivos_base:

@@ -11,7 +11,7 @@ def login_view():
     """Tela de login principal"""
     
     # Determinar período atual
-    periodo_atual = os.getenv("PERIODO_ATUAL", "2025-2A")
+    periodo_atual = os.getenv("PERIODO_ATUAL", "2026-1A")
     print(f"=== DEBUG: login_view ===")
     print(f"PERIODO_ATUAL from env: '{periodo_atual}'")
     print(f"=== END DEBUG: login_view ===")

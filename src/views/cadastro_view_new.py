@@ -53,7 +53,7 @@ def cadastro_view():
         return True
     
     # Determinar período atual
-    periodo_atual = os.getenv("PERIODO_ATUAL", "2025-2A")
+    periodo_atual = os.getenv("PERIODO_ATUAL", "2026-1A")
     
     # Inicializar storage de usuários e validador
     user_storage = UserStorage()
