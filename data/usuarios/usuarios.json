@@ -62,13 +62,13 @@
   "giacomo.matizonkas@sou.inteli.edu.br": {
     "name": "Giacomo Zema Matizonkas",
     "passwd": "",
-    "turma": "T13",
+    "turma": "T17",
     "id": 11
   },
   "henrique.botti@sou.inteli.edu.br": {
     "name": "Henrique Milliorini Botti",
     "passwd": "",
-    "turma": "T13",
+    "turma": "T17",
     "id": 12
   },
   "iasmim.jesus@sou.inteli.edu.br": {
@@ -428,7 +428,7 @@
   "felipe.simao@sou.inteli.edu.br": {
     "name": "Felipe Freire Machado Simão",
     "passwd": "",
-    "turma": "T13",
+    "turma": "T17",
     "id": 72
   },
   "augustin.vains@sou.inteli.edu.br": {
@@ -580,5 +580,197 @@
     "passwd": "",
     "turma": "T14",
     "id": 97
+  },
+  "alexsander.barbosa@sou.inteli.edu.br": {
+    "name": "Alexsander da Silva Barbosa",
+    "passwd": "",
+    "turma": "T17",
+    "id": 98
+  },
+  "ana.jardim@sou.inteli.edu.br": {
+    "name": "Ana Cristina Alves Jardim",
+    "passwd": "",
+    "turma": "T17",
+    "id": 99
+  },
+  "anny.cerazi@sou.inteli.edu.br": {
+    "name": "Anny Jhulia Cerazi",
+    "passwd": "",
+    "turma": "T17",
+    "id": 100
+  },
+  "carlos.quaglia@sou.inteli.edu.br": {
+    "name": "Carlos Eduardo Serrano Quaglia",
+    "passwd": "",
+    "turma": "T17",
+    "id": 101
+  },
+  "catarina.felipe@sou.inteli.edu.br": {
+    "name": "Catarina Sayuri Arashiro Braga Felipe",
+    "passwd": "",
+    "turma": "T17",
+    "id": 102
+  },
+  "celso.junior@sou.inteli.edu.br": {
+    "name": "Celso Rodrigues Rocha Júnior",
+    "passwd": "",
+    "turma": "T17",
+    "id": 103
+  },
+  "debora.nogueira@sou.inteli.edu.br": {
+    "name": "Débora Pereira Nogueira",
+    "passwd": "",
+    "turma": "T17",
+    "id": 104
+  },
+  "eduardo.casarini@sou.inteli.edu.br": {
+    "name": "Eduardo Alonso Casarini",
+    "passwd": "",
+    "turma": "T17",
+    "id": 105
+  },
+  "emanuelly.dias@sou.inteli.edu.br": {
+    "name": "Emanuelly Cantarelli Dias",
+    "passwd": "",
+    "turma": "T17",
+    "id": 106
+  },
+  "felipe.teixeira@sou.inteli.edu.br": {
+    "name": "Felipe Neves Teixeira da Silva",
+    "passwd": "",
+    "turma": "T17",
+    "id": 107
+  },
+  "gabriel.reis@sou.inteli.edu.br": {
+    "name": "Gabriel Andrei dos Reis",
+    "passwd": "",
+    "turma": "T17",
+    "id": 108
+  },
+  "henrique.diniz@sou.inteli.edu.br": {
+    "name": "Henrique Rodrigues Diniz",
+    "passwd": "",
+    "turma": "T17",
+    "id": 109
+  },
+  "isaac.santos@sou.inteli.edu.br": {
+    "name": "Isaac Souza Santos",
+    "passwd": "",
+    "turma": "T17",
+    "id": 110
+  },
+  "jaime.almeida@sou.inteli.edu.br": {
+    "name": "Jaime Andrade de Almeida",
+    "passwd": "",
+    "turma": "T17",
+    "id": 111
+  },
+  "karol.barbosa@sou.inteli.edu.br": {
+    "name": "Karol Rocha Barbosa",
+    "passwd": "",
+    "turma": "T17",
+    "id": 112
+  },
+  "leonardo.vieira@sou.inteli.edu.br": {
+    "name": "Leonardo Ramos Vieira",
+    "passwd": "",
+    "turma": "T17",
+    "id": 113
+  },
+  "lucas.rogero@sou.inteli.edu.br": {
+    "name": "Lucas Picinato Rogero",
+    "passwd": "",
+    "turma": "T17",
+    "id": 114
+  },
+  "mariana.reis@sou.inteli.edu.br": {
+    "name": "Mariana Lacerda Reis",
+    "passwd": "",
+    "turma": "T17",
+    "id": 115
+  },
+  "mariana.pereira@sou.inteli.edu.br": {
+    "name": "Mariana Pereira de Souza",
+    "passwd": "",
+    "turma": "T17",
+    "id": 116
+  },
+  "matheus.silva@sou.inteli.edu.br": {
+    "name": "Matheus Ferreira da Silva",
+    "passwd": "",
+    "turma": "T17",
+    "id": 117
+  },
+  "mirela.bianchi@sou.inteli.edu.br": {
+    "name": "Mirela Schneider Bianchi",
+    "passwd": "",
+    "turma": "T17",
+    "id": 118
+  },
+  "nicholas.millani@sou.inteli.edu.br": {
+    "name": "Nicholas Anantha Krishnan Millani",
+    "passwd": "",
+    "turma": "T17",
+    "id": 119
+  },
+  "nicole.silva@sou.inteli.edu.br": {
+    "name": "Nicole Zanin Silva",
+    "passwd": "",
+    "turma": "T17",
+    "id": 120
+  },
+  "owen.paimba-sail@sou.inteli.edu.br": {
+    "name": "Owen Ahmed Robert Paimba-Sail",
+    "passwd": "",
+    "turma": "T17",
+    "id": 121
+  },
+  "paulo.fernandes@sou.inteli.edu.br": {
+    "name": "Paulo Henrique Bueno Fernandes",
+    "passwd": "",
+    "turma": "T17",
+    "id": 122
+  },
+  "rafael.campos@sou.inteli.edu.br": {
+    "name": "Rafael Figueiredo Campos",
+    "passwd": "",
+    "turma": "T17",
+    "id": 123
+  },
+  "rui.faco@sou.inteli.edu.br": {
+    "name": "Rui Miranda Ribeiro Facó",
+    "passwd": "",
+    "turma": "T17",
+    "id": 124
+  },
+  "tobias.araujo@sou.inteli.edu.br": {
+    "name": "Tobias Viana Araújo",
+    "passwd": "",
+    "turma": "T17",
+    "id": 125
+  },
+  "vinicius.maciel@sou.inteli.edu.br": {
+    "name": "Vinicius Alves Maciel",
+    "passwd": "",
+    "turma": "T17",
+    "id": 126
+  },
+  "vitor.silva@sou.inteli.edu.br": {
+    "name": "Vitor Ribeiro de Mattos Silva",
+    "passwd": "",
+    "turma": "T17",
+    "id": 127
+  },
+  "wendel.feitosa@sou.inteli.edu.br": {
+    "name": "Wendel Hebert Feitosa",
+    "passwd": "",
+    "turma": "T17",
+    "id": 128
+  },
+  "yudi.omaki@sou.inteli.edu.br": {
+    "name": "Yudi Nakamura Trevisani Omaki",
+    "passwd": "",
+    "turma": "T17",
+    "id": 129
   }
 }

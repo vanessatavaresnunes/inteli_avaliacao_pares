@@ -59,8 +59,8 @@ class AvaliacaoView:
         )
         
         # Mostra botão APENAS se explicitamente definido como development
-        # E se estiver rodando localmente
-        is_local = (not is_production) and is_local_hostname
+        # E se estiver rodando localmente (modificado a pedido do usuário para sempre mostrar)
+        is_local = True
         
         if is_local:
             if st.button("🧪 Preencher Dados de Teste", type="secondary", use_container_width=True):

@@ -6,7 +6,7 @@ from typing import Optional
 load_dotenv()
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY")
-BUCKET_NAME = os.getenv("BUCKET_NAME", "inteli_avaliacao_pares_sprint")
+BUCKET_NAME = os.getenv("BUCKET_NAME", "avaliacaopares_2026_1a")
 PERIODO_ATUAL = os.getenv("PERIODO_ATUAL", "2025-2A")  # Período acadêmico atual
 
 def get_current_period() -> str:
@@ -26,14 +26,15 @@ def get_bucket_for_period(periodo: str = None) -> str:
         
     Exemplos:
         get_bucket_for_period("2025-2A") -> "inteli_avaliacao_pares_sprint"
-        get_bucket_for_period("2025-2B") -> "inteli_avalpares_2025_2B"
+        get_bucket_for_period("2026-1A") -> "avaliacaopares_2026_1a"
         get_bucket_for_period() -> bucket do período atual (PERIODO_ATUAL)
     """
     if periodo is None:
         periodo = PERIODO_ATUAL
     
-    if periodo == "2025-2B":
-        # Para 2025-2B, usar o bucket que o usuário criou
+    if periodo == "2026-1A":
+        return "avaliacaopares_2026_1a"
+    elif periodo == "2025-2B":
         return "inteli_avalpares_2025_2B"
     else:
         # Para 2025-2A e anteriores, usar o bucket padrão
