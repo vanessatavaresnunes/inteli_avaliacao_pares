@@ -3,10 +3,10 @@
         "nome": "Entregas reais",
         "descricao": "Avalia o cumprimento das entregas da sprint. Leva em consideração se os prazos foram respeitados, se os formatos estavam corretos e se os artefatos foram bem executados.",
         "observacoes": [
-            "GitHub: Verificar se o colega fez commits dentro do prazo",
-            "GitHub: Verificar se o colega dez entregas funcionais",
-            "GitHub: Verificar se o colega seguiu padrões de projeto, nomeou corretamente os PRs",
-            "Trello: Verificar se o colega cumpriu com as tarefas atribuídas a ele e elas foram finalizadas no prazo.",
+            "Gitlab: Verificar se o colega fez commits dentro do prazo",
+            "Gitlab: Verificar se o colega dez entregas funcionais",
+            "Gitlab: Verificar se o colega seguiu padrões de projeto, nomeou corretamente os PRs",
+            "Issue Boards: Verificar se o colega cumpriu com as tarefas atribuídas a ele e elas foram finalizadas no prazo.",
             "Daily: Verificar se o colega foi atuante nas dailies, se posicionando sobre o que foi feito e o que vai fazer.",
             "Daily: Verificar se o colega participa ativamente das dailies contribuindo para a gestão diária e a condução do projeto."
         ]
@@ -15,9 +15,9 @@
         "nome": "Valor Percebido",
         "descricao": "Avalia o impacto das entregas para o grupo durante a sprint. Deve levar em consideração o valor agregado para o projeto, se houve a geração de novas ideias e achados valiosos para o parceiro e se o trabalho contribuiu para um avanço nos resultados esperados.",
         "observacoes": [
-            "GitHub: Verificar se o colega entregou algo que destravou uma etapa importante do projeto.",
-            "GitHub: Verificar se o item de informação / código entregue agregou valor ao projeto/sistema (ex: documentações relevantes, modelagens relevantes, novas funcionalidades, correções críticas, ganho de performance).",
-            "Trello: Verificar se as tarefas atribuídas ao colega contribuíram significativamente para o avanço do grupo ou para entregas mais complexas.",
+            "Gitlab: Verificar se o colega entregou algo que destravou uma etapa importante do projeto.",
+            "Gitlab: Verificar se o item de informação / código entregue agregou valor ao projeto/sistema (ex: documentações relevantes, modelagens relevantes, novas funcionalidades, correções críticas, ganho de performance).",
+            "Issue Boards: Verificar se as tarefas atribuídas ao colega contribuíram significativamente para o avanço do grupo ou para entregas mais complexas.",
             "Daily: Verificar se o colega compartilhou ideias ou sugestões que ajudaram o grupo a resolver problemas ou tomar decisões.",
             "Daily: Verificar se o colega trouxe aprendizados, achados ou validações que contribuíram para o parceiro ou para a visão do produto.",
             "Horário de desenvolvimento: Verificar se o colega ajudou outros membros do grupo a finalizar tarefas ou superar obstáculos durante os horários coletivos."
@@ -27,9 +27,9 @@
         "nome": "Caixa de Ferramentas",
         "descricao": "Avalia o desenvolvimento técnico do aluno, verificando se a pessoa evoluiu e absorveu os conceitos técnicos, conseguindo aplicá-los na prática (afinal, estamos em uma faculdade de tecnologia).",
         "observacoes": [
-            "GitHub: Verificar se o colega usou conceitos técnicos aprendidos no módulo (ex: bibliotecas novas, estruturação correta do código, uso de boas práticas).",
-            "GitHub: Verificar se houve evolução técnica ao longo do tempo (ex: começou com pequenos ajustes e passou a contribuir com partes mais complexas).",
-            "Trello: Verificar se o colega assumiu tarefas técnicas mais desafiadoras ou complexas.",
+            "Gitlab: Verificar se o colega usou conceitos técnicos aprendidos no módulo (ex: bibliotecas novas, estruturação correta do código, uso de boas práticas).",
+            "Gitlab: Verificar se houve evolução técnica ao longo do tempo (ex: começou com pequenos ajustes e passou a contribuír com partes mais complexas).",
+            "Issue Boards: Verificar se o colega assumiu tarefas técnicas mais desafiadoras ou complexas.",
             "Daily: Verificar se o colega demonstra domínio técnico ao explicar o que está desenvolvendo.",
             "Daily: Verificar se o colega compartilha aprendizados técnicos com o grupo ou propõe soluções com base nos conteúdos aprendidos.",
             "Horário de desenvolvimento: Verificar se o colega aproveitou os momentos de trabalho para experimentar ferramentas e consolidar o aprendizado técnico na prática."
