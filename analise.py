@@ -78,22 +78,10 @@ def carregar_alunos_json(periodo: str = "2025-2A"):
 
 def carregar_sprint_dates(periodo: str = "2026-1A"):
     """
-    Carrega datas das sprints para um período específico
-    
-    Args:
-        periodo: Período acadêmico (ex: "2025-2A", "2025-2B", "2026-1A")
-    
-    Returns:
-        Dicionário com informações das sprints
+    Carrega datas das sprints para o período
     """
     try:
-        if periodo == "2026-1A":
-            arquivo = 'data/sprint_dates_2026_1a.json'
-        elif periodo == "2025-2B":
-            arquivo = 'data/sprint_dates_2025_2b.json'
-        else:
-            arquivo = 'data/sprint_dates_2025_2a.json'
-        
+        arquivo = 'data/sprint_dates_2026_1a.json'
         with open(arquivo, 'r', encoding='utf-8') as f:
             return json.load(f).get("sprints", {})
     except Exception as e:
@@ -104,14 +92,8 @@ st.set_page_config(page_title="Análise das Avaliações", layout="wide")
 
 st.title("🔎 Análise das Avaliações de Pares")
 
-# Seleção de período
-periodos_disponiveis = ["2025-2A", "2025-2B", "2026-1A"]
-periodo_atual = st.selectbox(
-    "📅 Selecionar Período:",
-    options=periodos_disponiveis,
-    index=2,  # Default para 2026-1A
-    key="periodo_analise"
-)
+# Período fixo
+periodo_atual = "2026-1A"
 
 st.markdown("---")
 

@@ -21,30 +21,16 @@ def get_current_period() -> str:
 
 def get_bucket_for_period(periodo: str = None) -> str:
     """
-    Retorna o nome do bucket baseado no período acadêmico.
-    Se nenhum período for especificado, usa o período atual.
+    Retorna o nome do bucket correto do Supabase dependendo do período acadêmico.
+    Simplificado para sempre retornar avaliacaopares_2026_1a.
     
     Args:
-        periodo: Período acadêmico (ex: "2025-2A", "2025-2B"). Se None, usa o período atual.
-    
-    Returns:
-        Nome do bucket para o período especificado
+        periodo: Período acadêmico 
         
-    Exemplos:
-        get_bucket_for_period("2025-2A") -> "inteli_avaliacao_pares_sprint"
-        get_bucket_for_period("2026-1A") -> "avaliacaopares_2026_1a"
-        get_bucket_for_period() -> bucket do período atual (PERIODO_ATUAL)
+    Returns:
+        String com o nome do bucket
     """
-    if periodo is None:
-        periodo = PERIODO_ATUAL
-    
-    if periodo == "2026-1A":
-        return "avaliacaopares_2026_1a"
-    elif periodo == "2025-2B":
-        return "inteli_avalpares_2025_2B"
-    else:
-        # Para 2025-2A e anteriores, usar o bucket padrão
-        return "inteli_avaliacao_pares_sprint"
+    return BUCKET_NAME
 
 def get_supabase_client():
     """Cria e retorna cliente Supabase"""
