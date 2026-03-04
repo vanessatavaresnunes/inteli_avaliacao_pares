@@ -7,11 +7,17 @@ load_dotenv()
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY")
 BUCKET_NAME = os.getenv("BUCKET_NAME", "avaliacaopares_2026_1a")
-PERIODO_ATUAL = os.getenv("PERIODO_ATUAL", "2025-2A")  # Período acadêmico atual
+# Configurações do Supabase
+PERIODO_ATUAL = os.getenv("PERIODO_ATUAL", "2026-1A")  # Período acadêmico atual
 
 def get_current_period() -> str:
-    """Retorna o período acadêmico atual configurado"""
-    return PERIODO_ATUAL
+    """
+    Retorna o período atual baseado na variável de ambiente ou fallback.
+    
+    Returns:
+        String com o período atual (ex: "2025-2A", "2025-2B", "2026-1A")
+    """
+    return os.getenv("PERIODO_ATUAL", "2026-1A")
 
 def get_bucket_for_period(periodo: str = None) -> str:
     """

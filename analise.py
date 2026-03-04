@@ -76,18 +76,20 @@ def carregar_alunos_json(periodo: str = "2025-2A"):
         print(f"Erro ao carregar alunos.json: {e}")
         return {}
 
-def carregar_sprint_dates(periodo: str = "2025-2A"):
+def carregar_sprint_dates(periodo: str = "2026-1A"):
     """
     Carrega datas das sprints para um período específico
     
     Args:
-        periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+        periodo: Período acadêmico (ex: "2025-2A", "2025-2B", "2026-1A")
     
     Returns:
         Dicionário com informações das sprints
     """
     try:
-        if periodo == "2025-2B":
+        if periodo == "2026-1A":
+            arquivo = 'data/sprint_dates_2026_1a.json'
+        elif periodo == "2025-2B":
             arquivo = 'data/sprint_dates_2025_2b.json'
         else:
             arquivo = 'data/sprint_dates_2025_2a.json'
@@ -103,11 +105,11 @@ st.set_page_config(page_title="Análise das Avaliações", layout="wide")
 st.title("🔎 Análise das Avaliações de Pares")
 
 # Seleção de período
-periodos_disponiveis = ["2025-2A", "2025-2B"]
+periodos_disponiveis = ["2025-2A", "2025-2B", "2026-1A"]
 periodo_atual = st.selectbox(
     "📅 Selecionar Período:",
     options=periodos_disponiveis,
-    index=1,  # Default para 2025-2B
+    index=2,  # Default para 2026-1A
     key="periodo_analise"
 )
 
@@ -624,8 +626,8 @@ for grupo in grupos:
                 menor = df_result["Total"].min()
                 n_alunos = len(df_result)  # Tamanho do grupo (N)
                 
-                # Usar nova fórmula para período 2025-2B, fórmula antiga para outros períodos
-                if periodo_atual == "2025-2B":
+                # Usar nova fórmula para período 2025-2B ou 2026-1A, fórmula antiga para outros períodos
+                if periodo_atual in ["2025-2B", "2026-1A"]:
                     # Nova fórmula: Índice = (Px - Pmédi) / ((Pmax - Pmin) + K)
                     df_result["Nota"] = df_result["Total"].apply(
                         lambda px: calcular_indice_nova_formula(px, medias, maior, menor, n_alunos)

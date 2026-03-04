@@ -30,7 +30,7 @@ class AvaliacaoController:
         """
         # Determinar período a ser usado
         if periodo is None:
-            periodo = os.getenv("PERIODO_ATUAL", "2025-2A")
+            periodo = os.getenv("PERIODO_ATUAL", "2026-1A")
         
         print(f"--- DEBUG: AvaliacaoController.__init__ ---")
         print(f"Using periodo: {periodo}")

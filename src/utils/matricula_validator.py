@@ -21,7 +21,7 @@ class MatriculaValidator:
         self.usuarios_file = Path("data/usuarios/usuarios.json")
         
         print("--- DEBUG: MatriculaValidator.__init__ ---")
-        periodo_env = os.getenv("PERIODO_ATUAL", "2025-2A")
+        periodo_env = os.getenv("PERIODO_ATUAL", "2026-1A")
         print(f"PERIODO_ATUAL from env: {periodo_env}")
         
         if periodo is None:

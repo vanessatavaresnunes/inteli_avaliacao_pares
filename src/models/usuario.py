@@ -42,7 +42,7 @@ class UsuarioModel:
             print(f"Erro ao carregar dados iniciais de alunos: {e}")
             self.alunos = {}
 
-    def obter_turmas(self, periodo: str = "2025-2A") -> list:
+    def obter_turmas(self, periodo: str = "2026-1A") -> list:
         """
         Retorna as turmas disponíveis baseadas no arquivo alunos.json principal.
         
@@ -63,7 +63,7 @@ class UsuarioModel:
             print(f"Erro ao carregar turmas do arquivo alunos.json: {e}")
             return []
 
-    def _carregar_alunos(self, turma: str = None, periodo: str = "2025-2A") -> Dict[str, List[Dict[str, str]]]:
+    def _carregar_alunos(self, turma: str = None, periodo: str = "2026-1A") -> Dict[str, List[Dict[str, str]]]:
         """
         Carrega dados dos alunos do arquivo alunos.json principal.
         
@@ -222,7 +222,7 @@ class UsuarioModel:
             "nota_maxima": nota_maxima
         }
     
-    def obter_times(self, turma: str = None, periodo: str = "2025-2A") -> List[str]:
+    def obter_times(self, turma: str = None, periodo: str = "2026-1A") -> List[str]:
         """
         Retorna lista de times disponíveis para a turma informada ou atual.
         
@@ -235,7 +235,7 @@ class UsuarioModel:
             return list(alunos.keys())
         return list(self.alunos.keys())
 
-    def obter_alunos_por_time(self, time: str, turma: str = None, periodo: str = "2025-2A") -> List[Dict[str, any]]:
+    def obter_alunos_por_time(self, time: str, turma: str = None, periodo: str = "2026-1A") -> List[Dict[str, any]]:
         """
         Retorna lista de alunos de um time específico para a turma informada ou atual.
         
@@ -249,7 +249,7 @@ class UsuarioModel:
             return alunos.get(time, [])
         return self.alunos.get(time, [])
     
-    def obter_alunos_time_excluindo(self, time: str, aluno_excluir: str, turma: str = None, periodo: str = "2025-2A") -> List[Dict[str, any]]:
+    def obter_alunos_time_excluindo(self, time: str, aluno_excluir: str, turma: str = None, periodo: str = "2026-1A") -> List[Dict[str, any]]:
         """
         Retorna lista de alunos de um time excluindo um aluno específico
         
