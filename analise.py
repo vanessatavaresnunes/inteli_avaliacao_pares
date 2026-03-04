@@ -238,38 +238,10 @@ turmas_no_df = df['turma'].unique() if not df.empty else []
 
 # Carregar todas as turmas disponíveis (não apenas as com avaliações)
 def carregar_todas_turmas(df_avaliacoes):
-    """Carrega todas as turmas disponíveis de diferentes fontes"""
-    turmas_avaliacao = []
-    turmas_alunos = []
-    turmas_usuarios = []
-    
-    # 1. Turmas com dados de avaliação
-    if df_avaliacoes is not None and not df_avaliacoes.empty and 'turma' in df_avaliacoes.columns:
-        # Filtrar valores nulos e vazios da coluna turma
-        turmas_validas = df_avaliacoes['turma'].dropna()
-        turmas_validas = turmas_validas[turmas_validas != '']
-        turmas_avaliacao = sorted(turmas_validas.unique())
-    
-    # 2. Turmas do arquivo de alunos (definição oficial)
+    """Carrega apenas as turmas configuradas para o período atual no alunos.json"""
     alunos_data = carregar_alunos_json(periodo_atual)
-    turmas_alunos = sorted(list(alunos_data.keys()))
-    
-    # 3. Turmas do arquivo de usuários (fallback)
-    try:
-        with open('data/usuarios/usuarios.json', 'r', encoding='utf-8') as f:
-            usuarios = json.load(f)
-        
-        turmas_set = set()
-        for email, dados in usuarios.items():
-            if 'turma' in dados:
-                turmas_set.add(dados['turma'])
-        turmas_usuarios = sorted(list(turmas_set))
-    except Exception as e:
-        print(f"Erro ao carregar turmas do arquivo de usuários: {e}")
-    
-    # Combinar todas as turmas (prioridade: alunos.json > usuarios.json > avaliações)
-    todas_turmas = sorted(set(turmas_alunos + turmas_usuarios + turmas_avaliacao))
-    return todas_turmas
+    turmas = sorted(list(alunos_data.keys())) if alunos_data else ["T17"]
+    return turmas
 
 # Carregar todas as turmas disponíveis
 todas_turmas = carregar_todas_turmas(df)
