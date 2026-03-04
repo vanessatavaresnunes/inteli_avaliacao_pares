@@ -9,7 +9,7 @@ def calcular_k_por_tamanho_grupo(n: int) -> int:
     """
     Calcula o valor de K (lastro) baseado no tamanho do grupo N.
     
-    Valores de K para o período 2025-2B:
+    Valores de K baseados no tamanho do grupo N:
     - N=4 → K=9
     - N=5 → K=14
     - N=6 → K=44
@@ -33,7 +33,7 @@ def calcular_k_por_tamanho_grupo(n: int) -> int:
 
 def calcular_indice_nova_formula(px: float, p_medio: float, p_max: float, p_min: float, n: int) -> float:
     """
-    Calcula o índice usando a nova fórmula para o período 2025-2B:
+    Calcula o índice usando a nova fórmula:
     Índice = fator × (Px - Pmédi) / ((Pmax - Pmin) + K)
     Com limite entre -0.4 e +0.4
     
@@ -63,7 +63,7 @@ def carregar_alunos_json(periodo: str = "2025-2A"):
     Carrega dados dos alunos do arquivo alunos.json para um período específico
     
     Args:
-        periodo: Período acadêmico (ex: "2025-2A", "2025-2B")
+        periodo: Período acadêmico (ex: "2026-1A")
     """
     try:
         with open('data/alunos.json', 'r', encoding='utf-8') as f:
@@ -133,7 +133,7 @@ if st.session_state.get('show_direct_search', False):
     with col_turma:
         turma_busca = st.selectbox(
             "Turma:",
-            options=["T09", "T13", "Teste"],
+            options=["T17", "Teste"],
             key="turma_busca_direta"
         )
     
@@ -608,16 +608,11 @@ for grupo in grupos:
                 menor = df_result["Total"].min()
                 n_alunos = len(df_result)  # Tamanho do grupo (N)
                 
-                # Usar nova fórmula para período 2025-2B ou 2026-1A, fórmula antiga para outros períodos
-                if periodo_atual in ["2025-2B", "2026-1A"]:
-                    # Nova fórmula: Índice = (Px - Pmédi) / ((Pmax - Pmin) + K)
-                    df_result["Nota"] = df_result["Total"].apply(
-                        lambda px: calcular_indice_nova_formula(px, medias, maior, menor, n_alunos)
-                    )
-                else:
-                    # Fórmula antiga: (Total - Média) / (0.6 × Amplitude)
-                    denominador = 0.6 * (maior - menor) if maior != menor else 1
-                    df_result["Nota"] = ((df_result["Total"] - medias) / denominador).round(1)
+                # Sempre usar a nova fórmula para 2026-1A em diante
+                # Nova fórmula: Índice = (Px - Pmédi) / ((Pmax - Pmin) + K)
+                df_result["Nota"] = df_result["Total"].apply(
+                    lambda px: calcular_indice_nova_formula(px, medias, maior, menor, n_alunos)
+                )
             
             # Exibir tabela com nomes coloridos
             st.markdown(

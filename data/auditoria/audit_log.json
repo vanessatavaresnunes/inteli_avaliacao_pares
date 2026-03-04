@@ -820,5 +820,19 @@
     "email": "henrique.botti@sou.inteli.edu.br",
     "ip_address": "N/A",
     "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2026-03-04T10:19:18.425232",
+    "acao": "LOGIN",
+    "email": "henrique.botti@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
+  },
+  {
+    "timestamp": "2026-03-04T10:23:23.587763",
+    "acao": "LOGIN",
+    "email": "henrique.botti@sou.inteli.edu.br",
+    "ip_address": "N/A",
+    "status": "SUCESSO"
   }
 ]

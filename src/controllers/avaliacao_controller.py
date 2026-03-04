@@ -590,35 +590,15 @@ class AvaliacaoController:
         """
         if 'email_pendente' in st.session_state:
             email_info = st.session_state['email_pendente']
-            try:
-                # Aguardar consolidação dos dados
-                import time
-                print(f"⏳ Aguardando consolidação dos dados antes do envio de email...")
-                time.sleep(2)  # Aguardar 2 segundos para consolidação
-                
-                # Forçar recarregamento dos dados do Supabase
-                print(f"🔄 Forçando recarregamento dos dados do Supabase...")
-                self.avaliacao_model._cache_dados = None  # Limpar cache se existir
-                
-                sucesso, mensagem = self.enviar_avaliacoes_por_email(email_info['email'])
-                if sucesso:
-                    st.success(f"📧 Email enviado com sucesso para {email_info['email']}")
-                else:
-                    # Mensagem simplificada para o usuário quando há erro de credenciais
-                    if "BadCredentials" in mensagem or "Username and Password not accepted" in mensagem:
-                        st.info(f"ℹ️ Avaliações salvas com sucesso! (Envio de email pendente de configuração)")
-                    else:
-                        st.warning(f"⚠️ Email não foi enviado: {mensagem}")
-            except Exception as e:
-                erro_str = str(e)
-                # Mensagem simplificada para o usuário quando há erro de credenciais
-                if "BadCredentials" in erro_str or "Username and Password not accepted" in erro_str:
-                    st.info(f"ℹ️ Avaliações salvas com sucesso! (Envio de email pendente de configuração)")
-                else:
-                    st.warning(f"⚠️ Erro ao enviar email: {str(e)}")
-            finally:
-                # Limpar email pendente
-                del st.session_state['email_pendente']
+            # Email integration is currently disabled by user request.
+            # print(f"📤 Enviando email para {email_info['email']}...")
+            # sucesso, mensagem = self.enviar_avaliacoes_por_email(email_info['email'])
+            
+            # Show the new bolder success message in a blue box
+            st.info("### ℹ️ **Avaliações salvas com sucesso!** Salve sua avaliação copiando o conteúdo desta página ou imprimindo em pdf.")
+            
+            # Limpar email pendente
+            del st.session_state['email_pendente']
     
     def obter_eixos(self) -> List[Dict[str, any]]:
         """Obtém lista de eixos de avaliação com nome, descrição e observações"""
